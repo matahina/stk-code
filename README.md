@@ -1,4 +1,4 @@
-# SuperTuxKart Eat My Tyre (ETM) Edition by Nomagno, based on STK 2.X Alpha, rebranded by matahina with IMPORTANT FIXES!
+# SuperTuxKart Eat My Tyre (EMT) Edition by Nomagno, based on STK 2.X Alpha, rebranded by matahina with IMPORTANT FIXES!
 ### + Command Manager (CM) by Kimden
 #### Or in short, STK 2.Xue TME + CM :P
 SuperTuxKart is a free kart racing game. The SuperTuxKart homepage can be found at <https://supertuxkart.net/>.
