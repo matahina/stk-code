@@ -18,7 +18,7 @@ Or you can use <https://github.com/matahina/ultimate-stk-launcher> under much de
 
 ## A shorter and clearer and more ergonomic version of the description provided by Nomagno.
 
-![STK Eat My Tyre edition](/logo_slim_github.png)
+![STK Eat My Tyre edition](/logo_slim_github.jpg)
 
 ## License
 
