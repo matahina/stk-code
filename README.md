@@ -12,9 +12,11 @@ SuperTuxKart is a free kart racing game. The SuperTuxKart homepage can be found 
 
 ## Building from source
 
-This repository is a clone from <https://github.com/Nomagno/stk-code>. However, some bugfixes since latest "release" are provided here. Follow *his* instructions but use this repo for the code.
+This repository is a clone from <https://github.com/Nomagno/stk-code>. However, some bugfixes since latest "release" are provided here. Follow *his* instructions but use this repo for bleeding-edge development code. There are also new repo for specific assets needed with this mode <https://github.com/Nomagno/stk-assets>.
 
 Or you can use <https://github.com/matahina/ultimate-stk-launcher> under much development recently.
+
+Previous TME release was July and latest commit from this branch working with previous release was `87b216b21f727a49467d1803597b965fda7db503`
 
 ## A shorter and clearer and more ergonomic version of the description provided by Nomagno.
 
