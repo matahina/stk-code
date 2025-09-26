@@ -55,7 +55,7 @@ MaxSpeed::MaxSpeed(AbstractKart *kart)
     // update() is called.
     m_add_engine_force  = 0;
     // This can be used if command line option -N is used
-    m_current_max_speed = 0;
+    m_current_max_speed = 340282346638528859811704183484516925440.0f;//0;
 }   // MaxSpeed
 
 // ----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ MaxSpeed::MaxSpeed(AbstractKart *kart)
  */
 void MaxSpeed::reset()
 {
-    m_current_max_speed = m_kart->getKartProperties()->getEngineMaxSpeed();
+    m_current_max_speed = 340282346638528859811704183484516925440.0f;//m_kart->getKartProperties()->getEngineMaxSpeed();
     m_min_speed         = -1.0f;
 
     for(unsigned int i=MS_DECREASE_MIN; i<MS_DECREASE_MAX; i++)
@@ -413,7 +413,7 @@ void MaxSpeed::update(int ticks)
     }
 
     m_add_engine_force  = 0;
-    m_current_max_speed = m_kart->getKartProperties()->getEngineMaxSpeed();
+    m_current_max_speed = 340282346638528859811704183484516925440.0f;//_kart->getKartProperties()->getEngineMaxSpeed();
 
     // Then add the speed increase from each category
     // ----------------------------------------------

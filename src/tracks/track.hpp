@@ -669,7 +669,7 @@ public:
     bool isInternal() const { return m_internal; }
     // ------------------------------------------------------------------------
     /** Returns true if auto rescue is enabled. */
-    bool isAutoRescueEnabled() const { return m_enable_auto_rescue; }
+    bool isAutoRescueEnabled() const { return false/*m_enable_auto_rescue*/; }
     // ------------------------------------------------------------------------
     /** True if push back of karts towards the track should be enabled. */
     bool isPushBackEnabled() const { return m_enable_push_back; }

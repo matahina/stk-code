@@ -377,7 +377,7 @@ void Kart::reset()
     m_invulnerable_ticks   = 0;
     m_min_nitro_ticks      = 0;
     m_energy_to_min_ratio  = 0;
-    m_collected_energy     = 0;
+    m_collected_energy     = 1;
     m_bounce_back_ticks    = 0;
     m_brake_ticks          = 0;
     m_ticks_last_crash     = 0;
@@ -1605,11 +1605,11 @@ void Kart::update(int ticks)
         const float roll = quad_normal.angle
                ((Vec3(0, 1, 0).rotate(q.getAxis(), q.getAngle())));
 
-        if (Track::getCurrentTrack()->isAutoRescueEnabled() &&
+        if (/*Track::getCurrentTrack()->isAutoRescueEnabled() &&
             (!m_terrain_info->getMaterial() ||
             !m_terrain_info->getMaterial()->hasGravity()) &&
             !has_animation_before && fabs(roll) > 60 * DEGREE_TO_RAD &&
-            fabs(getSpeed()) < 3.0f)
+            fabs(getSpeed()) < 3.0f*/false)
         {
             RescueAnimation::create(this, /*is_auto_rescue*/true);
             m_last_factor_engine_sound = 0.0f;
@@ -1699,8 +1699,8 @@ void Kart::update(int ticks)
         const Vec3 *min, *max;
         Track::getCurrentTrack()->getAABB(&min, &max);
 
-        if((min->getY() - getXYZ().getY() > 17 || dist_to_sector > 25) && !m_flying &&
-           !has_animation_before)
+        if(/*(min->getY() - getXYZ().getY() > 17 || dist_to_sector > 25) && !m_flying &&
+           !has_animation_before*/false)
         {
             RescueAnimation::create(this);
             m_last_factor_engine_sound = 0.0f;
@@ -1708,7 +1708,7 @@ void Kart::update(int ticks)
     }
     else
     {
-        if (!has_animation_before && material->isDriveReset() && isOnGround())
+        if (false && !has_animation_before && material->isDriveReset() && isOnGround())
         {
             RescueAnimation::create(this);
             m_last_factor_engine_sound = 0.0f;
@@ -2204,7 +2204,7 @@ void Kart::handleZipper(const Material *material, bool play_sound)
         if(duration<0)
             duration           = m_kart_properties->getZipperDuration();
         if(speed_gain<0)
-            speed_gain         = m_kart_properties->getZipperSpeedGain();
+            speed_gain         = m_kart_properties->getZipperSpeedGain()*16;
         if(fade_out_time<0)
             fade_out_time      = m_kart_properties->getZipperFadeOutTime();
         if(engine_force<0)
@@ -2442,7 +2442,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
             }
         }
 #endif
-        if (m->getCollisionReaction() == Material::RESCUE)
+        if (false && m->getCollisionReaction() == Material::RESCUE)
         {
             RescueAnimation::create(this);
             m_last_factor_engine_sound = 0.0f;

@@ -62,7 +62,7 @@ Powerup::~Powerup()
  */
 void Powerup::reset()
 {
-    m_type = PowerupManager::POWERUP_NOTHING;
+    m_type = PowerupManager::POWERUP_ZIPPER;//POWERUP_NOTHING;
     m_number = 0;
 
     // Ghost kart will update powerup every frame
@@ -491,7 +491,7 @@ void Powerup::use()
     if ( m_number <= 0 )
     {
         m_number = 0;
-        m_type   = PowerupManager::POWERUP_NOTHING;
+        m_type   = PowerupManager::POWERUP_ZIPPER;//POWERUP_NOTHING;
     }
 }   // use
 

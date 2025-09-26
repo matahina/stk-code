@@ -1170,19 +1170,19 @@ float KartProperties::getNitroDuration() const
 // ----------------------------------------------------------------------------
 float KartProperties::getNitroEngineForce() const
 {
-    return m_cached_characteristic->getNitroEngineForce();
+    return m_cached_characteristic->getNitroEngineForce()*2;
 }  // getNitroEngineForce
 
 // ----------------------------------------------------------------------------
 float KartProperties::getNitroEngineMult() const
 {
-    return m_cached_characteristic->getNitroEngineMult();
+    return m_cached_characteristic->getNitroEngineMult()*2;
 }  // getNitroEngineMult
 
 // ----------------------------------------------------------------------------
 float KartProperties::getNitroConsumption() const
 {
-    return m_cached_characteristic->getNitroConsumption();
+    return m_cached_characteristic->getNitroConsumption()*0;
 }  // getNitroConsumption
 
 // ----------------------------------------------------------------------------
@@ -1212,7 +1212,7 @@ float KartProperties::getNitroFadeOutTime() const
 // ----------------------------------------------------------------------------
 float KartProperties::getNitroMax() const
 {
-    return m_cached_characteristic->getNitroMax();
+    return m_cached_characteristic->getNitroMax()*64;
 }  // getNitroMax
 
 // ----------------------------------------------------------------------------
