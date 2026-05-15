@@ -2,7 +2,11 @@
 #define PROTOCOL_ENUM_HPP
 
 /** \enum ProtocolType
+<<<<<<< HEAD
  *  \brief The types that protocols can have. This is used to select which 
+=======
+ *  \brief The types that protocols can have. This is used to select which
+>>>>>>> officialSTK/master
  *   protocol receives which event.
  *  \ingroup network
  */

@@ -15,10 +15,13 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 // Manages includes common to all options screens
 #include "states_screens/options/options_common.hpp"
 
 #include "graphics/central_settings.hpp"
+#include "graphics/graphical_presets.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/sp/sp_base.hpp"
@@ -29,19 +32,21 @@
 #include "states_screens/dialogs/recommend_video_settings.hpp"
 #include "utils/profiler.hpp"
 
-#ifndef SERVER_ONLY
+
 #include <ge_main.hpp>
 #include <ge_vulkan_driver.hpp>
 #include <ge_vulkan_texture_descriptor.hpp>
-#endif
+
 
 #include <IrrlichtDevice.h>
 
 using namespace GUIEngine;
+using namespace GraphicalPresets;
 
 // --------------------------------------------------------------------------------------------
-void OptionsScreenVideo::initPresets()
+void OptionsScreenVideo::updateImageQuality(bool force_reload_texture)
 {
+<<<<<<< HEAD
     m_presets.push_back // Level 1
     ({
         false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
@@ -162,13 +167,17 @@ int OptionsScreenVideo::getImageQuality()
 void OptionsScreenVideo::setImageQuality(int quality, bool force_reload_texture)
 {
 #ifndef SERVER_ONLY
+=======
+>>>>>>> officialSTK/master
     core::dimension2du prev_max_size = irr_driver->getVideoDriver()
         ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
     GE::GEVulkanTextureDescriptor* td = NULL;
     if (GE::getVKDriver())
         td = GE::getVKDriver()->getMeshTextureDescriptor();
-    switch (quality)
+
+    if (td)
     {
+<<<<<<< HEAD
         case 0:
             UserConfigParams::m_anisotropic = 4;
             UserConfigParams::m_high_definition_textures = 0x02;
@@ -199,6 +208,12 @@ void OptionsScreenVideo::setImageQuality(int quality, bool force_reload_texture)
             break;
         default:
             assert(false);
+=======
+        if (UserConfigParams::m_anisotropic == 4)
+            td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_4);
+        if (UserConfigParams::m_anisotropic == 16)
+            td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
+>>>>>>> officialSTK/master
     }
 
     irr_driver->setMaxTextureSize();
@@ -215,41 +230,34 @@ void OptionsScreenVideo::setImageQuality(int quality, bool force_reload_texture)
     }
     else if (prev_max_size != cur_max_size || force_reload_texture)
         STKTexManager::getInstance()->reloadAllTextures(true/*mesh_texture_only*/);
-#endif
-}   // setImageQuality
+}   // updateImageQuality
 
 // --------------------------------------------------------------------------------------------
-
 OptionsScreenVideo::OptionsScreenVideo() : Screen("options/options_video.stkgui"),
                                            m_prev_adv_pipline(false)
 {
-    m_inited = false;
-    initPresets();
 }   // OptionsScreenVideo
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::loadedFromFile()
 {
-    m_inited = false;
-    assert(m_presets.size() == 7);
-    assert(m_blur_presets.size() == 3);
+    assert(gfx_presets.size() == 7);
+    assert(blur_presets.size() == 3);
 
     GUIEngine::SpinnerWidget* gfx =
         getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     gfx->m_properties[GUIEngine::PROP_MAX_VALUE] =
-        StringUtils::toString(m_presets.size());
+        StringUtils::toString(gfx_presets.size());
 
     GUIEngine::SpinnerWidget* blur =
         getWidget<GUIEngine::SpinnerWidget>("blur_level");
     blur->m_properties[GUIEngine::PROP_MAX_VALUE] =
-        StringUtils::toString(m_blur_presets.size() - 1);
+        StringUtils::toString(blur_presets.size() - 1);
     blur->m_properties[GUIEngine::PROP_MIN_VALUE] =
         StringUtils::toString(0);
 }   // loadedFromFile
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::init()
 {
     Screen::init();
@@ -261,8 +269,7 @@ void OptionsScreenVideo::init()
     ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     ribbon->select( "tab_video", PLAYER_ID_GAME_MASTER );
 
-    GUIEngine::SpinnerWidget* gfx =
-        getWidget<GUIEngine::SpinnerWidget>("gfx_level");
+    GUIEngine::SpinnerWidget* gfx = getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
     
     GUIEngine::SpinnerWidget* vsync = getWidget<GUIEngine::SpinnerWidget>("vsync");
@@ -272,10 +279,26 @@ void OptionsScreenVideo::init()
     //I18N: In the video options
     vsync->addLabel(_("Vertical Sync"));
 #ifdef MOBILE_STK
-    std::set<int> fps = { 30, 60, 120 };
+    std::set<int> fps = { 30, 60, 90, 120 };
 #else
-    std::set<int> fps = { 30, 60, 120, 180, 250, 500, 1000 };
+    std::set<int> fps = { 30, 60, 120, 180, 240, 480, 1000 };
 #endif
+
+    // We add the current refresh rate of all the available displays
+    // With std::set, duplicate values are discarded
+    int num_displays = SDL_GetNumVideoDisplays();
+    SDL_DisplayMode display_mode;
+
+    // Iterate through every connected display
+    for (int i = 0; i < num_displays; i++)
+    {
+        if (SDL_GetCurrentDisplayMode(i /* display_index */, &display_mode) == 0)
+        {
+            if (display_mode.refresh_rate > 0)
+                fps.insert(display_mode.refresh_rate);
+        }
+    }
+     
     fps.insert(UserConfigParams::m_max_fps);
     for (auto& i : fps)
         vsync->addLabel(core::stringw(i));
@@ -290,10 +313,10 @@ void OptionsScreenVideo::init()
         assert(it != fps.end());
         vsync->setValue(1 + std::distance(fps.begin(), it));
     }
-    //I18N: in graphical options. The \n is a newline character, place it where appropriate, two can be used if required.
+    //I18N: in the graphical options. The \n is a newline character, place it where appropriate, two can be used if required.
     core::stringw vsync_tooltip = _("Vsync forces the graphics card to supply a new frame\nonly when the monitor is ready to display it.");
 
-    //I18N: in graphical options.
+    //I18N: in the graphical options.
     vsync_tooltip = vsync_tooltip + L"\n" + _("Vsync will not work if your drivers don't support it.");
 
     vsync->setTooltip(vsync_tooltip);
@@ -323,25 +346,64 @@ void OptionsScreenVideo::init()
     scale_rtts->addLabel("200%");
 
     // --- set gfx settings values
-    updateGfxSlider();
+    updateGfxSlider(); // Also updates the RTTS slider
     updateBlurSlider();
-    updateScaleRTTsSlider();
 
     // ---- forbid changing graphic settings from in-game
     // (we need to disable them last because some items can't be edited when
     // disabled)
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
-#ifndef SERVER_ONLY
     gfx->setActive(!in_game && CVS->isGLSL());
+    // Outside of pauses, the GFX slider update already overwrites the pause tooltip.
+    // Running updatePauseTooltip would incorrectly disable the list of gfx settings.
+    if (in_game && CVS->isGLSL())
+        OptionsCommon::updatePauseTooltip(gfx, true);
+
     getWidget<ButtonWidget>("custom")->setActive(!in_game || !CVS->isGLSL());
-    if (getWidget<SpinnerWidget>("scale_rtts")->isActivated())
+    OptionsCommon::updatePauseTooltip(getWidget<ButtonWidget>("custom"), in_game && CVS->isGLSL());
+
+    if (scale_rtts->isActivated())
     {
-        getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game ||
-            GE::getDriver()->getDriverType() == video::EDT_VULKAN);
+        scale_rtts->setActive(!in_game || GE::getDriver()->getDriverType() == video::EDT_VULKAN);
+        OptionsCommon::updatePauseTooltip(scale_rtts,
+            in_game && GE::getDriver()->getDriverType() != video::EDT_VULKAN);
     }
+
     getWidget<ButtonWidget>("benchmarkCurrent")->setActive(!in_game);
-#endif
+    // Handle the setting/unsetting as we use a custom tooltip message
+    if (in_game)
+        getWidget<ButtonWidget>("benchmarkCurrent")->setTooltip(_("Performance tests are not possible during a race."));
+    else
+        getWidget<ButtonWidget>("benchmarkCurrent")->unsetTooltip();
+
+    GUIEngine::SpinnerWidget* bench_select = getWidget<GUIEngine::SpinnerWidget>("benchmarkSelect");
+    assert( bench_select != NULL );
+
+    // Only display the scene selection widget if there are multiple valid replays
+    if (stk_config->m_benchmark_files.size() <= 1)
+    {
+        bench_select->setActive(false);
+        bench_select->setVisible(false);
+        getWidget<LabelWidget>("benchmarkSelect_label")->setVisible(false);
+        // Disable the performance test button if there is no valid replay
+        if (stk_config->m_benchmark_files.size() == 0)
+            getWidget<ButtonWidget>("benchmarkCurrent")->setActive(false);
+    }
+    // Use the replay names as labels for selection
+    // TODO: support user-friendly names for when the game come with multiple default replays
+    else
+    {
+        bench_select->clearLabels();
+        for (auto it = stk_config->m_benchmark_files.begin();
+                it != stk_config->m_benchmark_files.end(); it++)
+        {
+            core::stringw bench_name = StringUtils::utf8ToWide(*it);
+            bench_select->addLabel(bench_name);
+        }
+        // Reset the active benchmark file in case we left and reentered options after changing it
+        stk_config->m_active_benchmark_file = stk_config->m_benchmark_files[0];
+    }
 
     // If a benchmark was requested and the game had to reload
     // the graphics engine, start the benchmark when the
@@ -351,18 +413,17 @@ void OptionsScreenVideo::init()
 }   // init
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::onResize()
 {
     Screen::onResize();
 }   // onResize
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::updateGfxSlider()
 {
     GUIEngine::SpinnerWidget* gfx = getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
+<<<<<<< HEAD
 
     bool found = false;
     for (unsigned int l = 0; l < m_presets.size(); l++)
@@ -390,36 +451,39 @@ void OptionsScreenVideo::updateGfxSlider()
     }
 
     if (!found)
+=======
+    int preset = findCurrentGFXPreset();
+    if (preset == -1) // Current settings don't match a preset
+>>>>>>> officialSTK/master
     {
         //I18N: custom video settings
         gfx->setCustomText( _("Custom") );
     }
+    else
+    {
+        gfx->setValue(preset);
+    }
 
-#ifndef SERVER_ONLY
     // Enable the blur slider if the modern renderer is used
     getWidget<GUIEngine::SpinnerWidget>("blur_level")->
         setActive(UserConfigParams::m_dynamic_lights && CVS->isGLSL());
     // Same with Render resolution slider
-    getWidget<GUIEngine::SpinnerWidget>("scale_rtts")->
-        setActive((UserConfigParams::m_dynamic_lights && CVS->isGLSL()) ||
-        GE::getDriver()->getDriverType() == video::EDT_VULKAN);
+    updateScaleRTTsSlider();
 
     updateTooltip();
-#endif
 } // updateGfxSlider
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::updateBlurSlider()
 {
     GUIEngine::SpinnerWidget* blur = getWidget<GUIEngine::SpinnerWidget>("blur_level");
     assert( blur != NULL );
 
     bool found = false;
-    for (unsigned int l = 0; l < m_blur_presets.size(); l++)
+    for (unsigned int l = 0; l < blur_presets.size(); l++)
     {
-        if (m_blur_presets[l].motionblur == UserConfigParams::m_motionblur &&
-            m_blur_presets[l].dof == UserConfigParams::m_dof)
+        if (blur_presets[l].motionblur == UserConfigParams::m_motionblur &&
+            blur_presets[l].dof == UserConfigParams::m_dof)
         {
             blur->setValue(l);
             found = true;
@@ -437,28 +501,29 @@ void OptionsScreenVideo::updateBlurSlider()
 } // updateBlurSlider
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::updateScaleRTTsSlider()
 {
-    GUIEngine::SpinnerWidget* scale_rtts_level = 
-        getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
-    assert( scale_rtts_level != NULL );
+    bool rtts_on = (UserConfigParams::m_dynamic_lights && CVS->isGLSL()) ||
+        GE::getDriver()->getDriverType() == video::EDT_VULKAN;
+
+    GUIEngine::SpinnerWidget* rtts_slider = getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
+    assert( rtts_slider != NULL );
+
+    rtts_slider->setActive(rtts_on);
 
     bool found = false;
-    for (unsigned int l = 0; l < m_scale_rtts_custom_presets.size(); l++)
+    float rtts_value = (rtts_on) ? UserConfigParams::m_scale_rtts_factor : 1.0f;
+    for (unsigned int l = 0; l < scale_rtts_presets.size(); l++)
     {
-        if (m_scale_rtts_custom_presets[l].value == UserConfigParams::m_scale_rtts_factor)
+        if (scale_rtts_presets[l].value == rtts_value)
         {
-            scale_rtts_level->setValue(l);
+            rtts_slider->setValue(l);
             found = true;
-            if (m_scale_rtts_custom_presets[l].value > 1.0f)
-            {
-                scale_rtts_level->markAsIncorrect();
-            }
+            if (scale_rtts_presets[l].value > 1.0f)
+                rtts_slider->markAsIncorrect();
             else
-            {
-                scale_rtts_level->markAsCorrect();
-            }
+                rtts_slider->markAsCorrect();
+
             break;
         }
     }
@@ -466,12 +531,11 @@ void OptionsScreenVideo::updateScaleRTTsSlider()
     if (!found)
     {
         //I18N: custom video settings
-        scale_rtts_level->setCustomText( _("Custom") );
+        rtts_slider->setCustomText( _("Custom") );
     }
 } // updateScaleRTTsSlider
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::updateTooltip()
 {
     GUIEngine::SpinnerWidget* gfx = getWidget<GUIEngine::SpinnerWidget>("gfx_level");
@@ -479,37 +543,19 @@ void OptionsScreenVideo::updateTooltip()
 
     core::stringw tooltip;
 
-    //I18N: in the graphical options tooltip;
-    // indicates a graphical feature is enabled
-    const core::stringw enabled = _("Enabled");
-    //I18N: in the graphical options tooltip;
-    // indicates a graphical feature is disabled
-    const core::stringw disabled = _("Disabled");
-    //I18N: if only important particles effects is enabled
-    const core::stringw important_only = _("Important only");
-
-    //I18N: in the graphical options tooltip;
-    const core::stringw very_low = _("Very Low");
-    //I18N: in the graphical options tooltip;
-    const core::stringw low = _("Low");
-    //I18N: in the graphical options tooltip;
-    const core::stringw medium = _("Medium");
-    //I18N: in the graphical options tooltip;
-    const core::stringw high = _("High");
-    //I18N: in the graphical options tooltip;
-    const core::stringw very_high = _("Very High");
-    //I18N: in the graphical options tooltip;
-    const core::stringw ultra = _("Ultra");
-    
-    //I18N: in graphical options
-    tooltip = _("Dynamic lights: %s",
-        UserConfigParams::m_dynamic_lights ? enabled : disabled);
-
-    //I18N: in graphical options
+    //I18N: in the graphical options
+    tooltip = UserConfigParams::m_dynamic_lights ? _("Dynamic lights: Enabled") :
+                                                   _("Dynamic lights: Disabled");
+    //I18N: in the graphical options
     if (UserConfigParams::m_shadows_resolution == 0)
-        tooltip = tooltip + L"\n" + _("Shadows: %s", disabled);
+    {
+        tooltip = tooltip + L"\n" + _("Shadows: %s", _C("Shadows", "Disabled"));
+        tooltip = tooltip + L"\n" + _("Soft shadows: Disabled");
+    }
     else
+    {
         tooltip = tooltip + L"\n" + _("Shadows: %i", UserConfigParams::m_shadows_resolution);
+<<<<<<< HEAD
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
         UserConfigParams::m_mlaa ? enabled : disabled);
@@ -538,28 +584,79 @@ void OptionsScreenVideo::updateTooltip()
         UserConfigParams::m_particles_effects == 2 ? enabled :
         UserConfigParams::m_particles_effects == 1 ? important_only :
         disabled);
+=======
+        tooltip = tooltip + L"\n" +
+            (UserConfigParams::m_pcss ?  _("Soft shadows: Enabled") :
+                                         _("Soft shadows: Disabled"));
+    }
 
-    //I18N: in graphical options
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_mlaa ? _("Anti-aliasing: Enabled") :
+                                    _("Anti-aliasing: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (!UserConfigParams::m_degraded_IBL ? _("Image-based lighting: Enabled") :
+                                             _("Image-based lighting: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_light_scatter ? _("Light scattering: Enabled") :
+                                             _("Light scattering: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_glow ? _("Glow (outlines): Enabled") :
+                                    _("Glow (outlines): Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_light_shaft ? _("Light shaft (God rays): Enabled") :
+                                           _("Light shaft (God rays): Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_bloom ? _("Bloom: Enabled") :
+                                     _("Bloom: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_ssao ? _("Ambient occlusion: Enabled") :
+                                    _("Ambient occlusion: Disabled"));
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_ssr ? _("Screen space reflection: Enabled") :
+                                   _("Screen space reflection: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_animated_characters ? _("Animated characters: Enabled") :
+                                                   _("Animated characters: Disabled"));
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" + _("Particle effects: %s",
+        UserConfigParams::m_particles_effects == 2 ? _C("Particle effects", "Enabled")        :
+        UserConfigParams::m_particles_effects == 1 ? _C("Particle effects", "Important only") :
+                                                     _C("Particle effects", "Disabled"));
+>>>>>>> officialSTK/master
+
+    //I18N: in the graphical options
     int quality = getImageQuality();
     tooltip = tooltip + L"\n" + _("Rendered image quality: %s",
-        quality == 0 ? very_low :
-        quality == 1 ? low      :
-        quality == 2 ? medium   : high);
+        quality == 0 ? _C("Image quality", "Very low") :
+        quality == 1 ? _C("Image quality", "Low")      :
+                       _C("Image quality", "High"));
 
+<<<<<<< HEAD
     //I18N: in graphical options
+=======
+    //I18N: in the graphical options
+>>>>>>> officialSTK/master
     int geometry_detail = UserConfigParams::m_geometry_level;
     tooltip = tooltip + L"\n" + _("Geometry detail: %s",
-        geometry_detail == 0 ? very_low  :
-        geometry_detail == 1 ? low       :
-        geometry_detail == 2 ? medium    :
-        geometry_detail == 3 ? high      :
-        geometry_detail == 4 ? very_high : ultra);
+        geometry_detail == 0 ?  _C("Geometry level", "Very low")  :
+        geometry_detail == 1 ?  _C("Geometry level", "Low")       :
+        geometry_detail == 2 ?  _C("Geometry level", "Medium")    :
+        geometry_detail == 3 ?  _C("Geometry level", "High")      :
+        geometry_detail == 4 ?  _C("Geometry level", "Very high") :
+                                _C("Geometry level", "Ultra high"));
 
     gfx->setTooltip(tooltip);
 }   // updateTooltip
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::updateBlurTooltip()
 {
     GUIEngine::SpinnerWidget* blur = getWidget<GUIEngine::SpinnerWidget>("blur_level");
@@ -567,16 +664,14 @@ void OptionsScreenVideo::updateBlurTooltip()
 
     core::stringw tooltip;
 
-    const core::stringw enabled = _("Enabled");
-    const core::stringw disabled = _("Disabled");
+    //I18N: in the graphical options
+    tooltip = UserConfigParams::m_motionblur ? _("Motion blur: Enabled") :
+                                               _("Motion blur: Disabled");
 
-    //I18N: in graphical options
-    tooltip = tooltip + _("Motion blur: %s",
-        UserConfigParams::m_motionblur ? enabled : disabled);
-
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Depth of field: %s",
-        UserConfigParams::m_dof ? enabled : disabled);
+    //I18N: in the graphical options
+    tooltip = tooltip + L"\n" +
+        (UserConfigParams::m_dof ? _("Depth of field: Enabled") :
+                                   _("Depth of field: Disabled"));
 
     blur->setTooltip(tooltip);
 }   // updateBlurTooltip
@@ -609,16 +704,16 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
             getWidget<GUIEngine::SpinnerWidget>("gfx_level");
         assert( gfx_level != NULL );
 
-        const int level = gfx_level->getValue() - 1;
+        const int level = gfx_level->getValue();
 
         // Enable the blur spinner only if the new renderer is on
-        getWidget<GUIEngine::SpinnerWidget>("blur_level")->setActive(level >= 2);
+        getWidget<GUIEngine::SpinnerWidget>("blur_level")->setActive(level >= 3);
 
         // Same with Render resolution slider
-#ifndef SERVER_ONLY
         getWidget<GUIEngine::SpinnerWidget>("scale_rtts")->
             setActive(UserConfigParams::m_dynamic_lights ||
             GE::getDriver()->getDriverType() == video::EDT_VULKAN);
+<<<<<<< HEAD
 #endif
         UserConfigParams::m_animated_characters = m_presets[level].animatedCharacters;
         UserConfigParams::m_particles_effects = m_presets[level].particles;
@@ -635,7 +730,11 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_geometry_level     = m_presets[level].geometry_detail;
         UserConfigParams::m_pcss               = m_presets[level].pc_soft_shadows;
         UserConfigParams::m_ssr                = m_presets[level].ssr;
+=======
+>>>>>>> officialSTK/master
 
+        applyGFXPreset(level);
+        updateImageQuality(false /* force reload textures */);
         updateGfxSlider();
         setSSR();
     }
@@ -649,8 +748,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
         if (UserConfigParams::m_dynamic_lights)
         {
-            UserConfigParams::m_motionblur = m_blur_presets[level].motionblur;
-            UserConfigParams::m_dof = m_blur_presets[level].dof;
+            UserConfigParams::m_motionblur = blur_presets[level].motionblur;
+            UserConfigParams::m_dof = blur_presets[level].dof;
         }
 
         updateBlurSlider();
@@ -674,33 +773,31 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
             StringUtils::fromString(fps, max_fps);
             UserConfigParams::m_max_fps = max_fps;
         }
-#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
         update_swap_interval(UserConfigParams::m_swap_interval);
 #endif
     } // vSync
     else if (name == "scale_rtts")
     {
-        GUIEngine::SpinnerWidget* scale_rtts_level =
+        GUIEngine::SpinnerWidget* rtts_slider =
             getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
-        assert( scale_rtts_level != NULL );
+        assert( rtts_slider != NULL );
 
-        const int level = scale_rtts_level->getValue();
-        assert(level < (int)m_scale_rtts_custom_presets.size());
+        const int level = rtts_slider->getValue();
+        assert(level < (int)scale_rtts_presets.size());
 
-        UserConfigParams::m_scale_rtts_factor = m_scale_rtts_custom_presets[level].value;
-#ifndef SERVER_ONLY
+        UserConfigParams::m_scale_rtts_factor = scale_rtts_presets[level].value;
+
         GE::GEVulkanDriver* gevk = GE::getVKDriver();
         if (gevk && GE::getGEConfig()->m_render_scale != UserConfigParams::m_scale_rtts_factor)
         {
             GE::getGEConfig()->m_render_scale = UserConfigParams::m_scale_rtts_factor;
             gevk->updateDriver();
         }
-#endif
         updateScaleRTTsSlider();
     } // scale_rtts
     else if (name == "benchmarkCurrent")
     {
-#ifndef SERVER_ONLY
         // To avoid crashes and ensure the proper settings are used during the benchmark,
         // we apply the settings. If this doesn't require restarting the screen, we start
         // the benchmark immediately, otherwise we schedule it to start after the restart.
@@ -708,8 +805,17 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
             profiler.startBenchmark();
         else
             RaceManager::get()->scheduleBenchmark();
-#endif
     } // benchmarkCurrent
+    else if (name == "benchmarkSelect")
+    {
+        GUIEngine::SpinnerWidget* bench_select = getWidget<GUIEngine::SpinnerWidget>("benchmarkSelect");
+        assert( bench_select != NULL );
+
+        const unsigned int bench_id = bench_select->getValue();
+        assert(bench_id < stk_config->m_benchmark_files.size());
+
+        stk_config->m_active_benchmark_file = stk_config->m_benchmark_files[bench_id];
+    }
     /*else if (name == "benchmarkRecommend")
     {
         new RecommendVideoSettingsDialog(0.8f, 0.9f);
@@ -717,33 +823,27 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 }   // eventCallback
 
 // --------------------------------------------------------------------------------------------
-
 void OptionsScreenVideo::tearDown()
 {
-#ifndef SERVER_ONLY
     applySettings();
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();
-#endif
 }   // tearDown
 
 // --------------------------------------------------------------------------------------------
 /* Returns 1 or 2 if a restart will be done, 0 otherwise */
 int OptionsScreenVideo::applySettings()
 {
-#ifndef SERVER_ONLY
     if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights && CVS->isGLSL())
     {
         irr_driver->sameRestart();
         return 1;
     }
-#endif
     return 0;
 }   // applySettings
 
 // --------------------------------------------------------------------------------------------
-
 bool OptionsScreenVideo::onEscapePressed()
 {
     GUIEngine::focusNothingForPlayer(PLAYER_ID_GAME_MASTER);
@@ -751,12 +851,32 @@ bool OptionsScreenVideo::onEscapePressed()
 }
 
 // --------------------------------------------------------------------------------------------
-
-void OptionsScreenVideo::unloaded()
+void OptionsScreenVideo::setSSR()
 {
-    m_inited = false;
-}   // unloaded
+    if (!UserConfigParams::m_ssr)
+        GE::getGEConfig()->m_screen_space_reflection_type = GE::GSSRT_DISABLED;
+    else
+    {
+        int val = UserConfigParams::m_geometry_level;
+        switch (val)
+        {
+        case 3:
+            GE::getGEConfig()->m_screen_space_reflection_type = GE::GSSRT_HIZ100;
+            break;
+        case 4:
+            GE::getGEConfig()->m_screen_space_reflection_type = GE::GSSRT_HIZ200;
+            break;
+        case 5:
+            GE::getGEConfig()->m_screen_space_reflection_type = GE::GSSRT_HIZ400;
+            break;
+        default:
+            GE::getGEConfig()->m_screen_space_reflection_type = GE::GSSRT_FAST;
+            break;
+        }
+    }
+}   // setSSR
 
+<<<<<<< HEAD
 // --------------------------------------------------------------------------------------------
 
 void OptionsScreenVideo::setSSR()
@@ -786,3 +906,6 @@ void OptionsScreenVideo::setSSR()
 #endif
 }   // setSSR
 
+=======
+#endif // ifndef SERVER_ONLY
+>>>>>>> officialSTK/master
