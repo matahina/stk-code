@@ -530,6 +530,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a unique identifier for this track (the directory name). */
     const std::string& getIdent          () const {return m_ident;            }
+    const std::string& getUntranslatedName() const { return m_name;           }
     // ------------------------------------------------------------------------
     /** Returns all groups this track belongs to. */
     const std::vector<std::string>&

@@ -979,6 +979,35 @@ void ServerLobby::asynchronousUpdate()
             // Reset for next state usage
             resetPeersReady();
 
+            Track* track = TrackManager::get()->getTrack(
+                m_game_setup->getCurrentTrack()
+            );
+
+            if (track)
+            {
+                std::string track_name = track->getUntranslatedName();
+
+                size_t separator = track_name.find('|');
+                if (separator != std::string::npos)
+                    track_name = track_name.substr(0, separator);
+
+                std::string designer =
+                    StringUtils::wideToUtf8(track->getDesigner());
+
+                std::string message = "Track: ";
+
+
+                if (track->isAddon())
+                    message += "🧩 ";
+
+                message += track_name;
+
+                if (!designer.empty())
+                    message += " | Designer: " + designer;
+
+                Comm::sendStringToAllPeers(message);
+            }
+
             m_state = LOAD_WORLD;
             Comm::sendMessageToPeers(load_world_message);
             // updatePlayerList so the in lobby players (if any) can see always
