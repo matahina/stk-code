@@ -194,6 +194,9 @@ public:
     bool isPreventTeamMess() const { return m_prevent_team_mess; }
     void setPreventTeamMess(bool value) { m_prevent_team_mess = value; }
 
+    int getIdleQuitMinutes() const { return m_idle_quit_minutes; }
+    void setIdleQuitMinutes(int value) { m_idle_quit_minutes = value; }
+
 private:
 
     int m_battle_hit_capture_limit;
@@ -285,6 +288,8 @@ private:
     bool m_save_server_config;
 
     bool m_prevent_team_mess;
+
+    int m_idle_quit_minutes;
 
     // Special, temporarily public
 public:

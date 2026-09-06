@@ -16,6 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+extern void main_abort();
+
+#include "utils/time.hpp"
+
 #include "network/protocols/server_lobby.hpp"
 
 #include "items/network_item_manager.hpp"
@@ -619,6 +623,9 @@ void ServerLobby::writePlayerReport(Event* event)
 /** Find out the public IP server or poll STK server asynchronously. */
 void ServerLobby::asynchronousUpdate()
 {
+
+    checkIdleQuitTimer();
+
     if (m_rs_state.load() == RS_ASYNC_RESET)
     {
         resetVotingTime();
@@ -2115,6 +2122,12 @@ void ServerLobby::checkRaceFinished()
     if (m_game_setup->isGrandPrix())
     {
         getGPManager()->updateGPScores(gp_changes, m_result_ns);
+
+        if (m_game_setup->getAllTracks().size() ==
+            m_game_setup->getTotalGrandPrixTracks())
+        {
+            armIdleQuitTimer();
+        }
     }
     else if (RaceManager::get()->modeHasLaps())
     {
@@ -4603,3 +4616,88 @@ void ServerLobby::onSpectatorStatusChange(const std::shared_ptr<STKPeer>& peer)
     }
 }   // onSpectatorStatusChange
 //-----------------------------------------------------------------------------
+
+void ServerLobby::armIdleQuitTimer()
+{
+    int minutes = getSettings()->getIdleQuitMinutes();
+
+    if (minutes <= 0)
+    {
+        m_idle_quit_armed = false;
+        return;
+    }
+
+    m_idle_quit_start_time = StkTime::getMonoTimeMs();
+    m_idle_quit_last_warning = 0;
+    m_idle_quit_armed = true;
+
+    Log::info(
+        "ServerLobby",
+        "Idle quit timer armed for %d minute(s).",
+        minutes
+    );
+}
+
+void ServerLobby::disarmIdleQuitTimer()
+{
+    m_idle_quit_armed = false;
+    m_idle_quit_start_time = 0;
+    m_idle_quit_last_warning = 0;
+}
+
+
+void ServerLobby::checkIdleQuitTimer()
+{
+    if (!m_idle_quit_armed)
+        return;
+
+    int minutes = getSettings()->getIdleQuitMinutes();
+
+    if (minutes <= 0)
+    {
+        disarmIdleQuitTimer();
+        return;
+    }
+
+    uint64_t now = StkTime::getMonoTimeMs();
+
+    uint64_t timeout =
+        static_cast<uint64_t>(minutes) * 60ULL * 1000ULL;
+
+    uint64_t elapsed =
+        now - m_idle_quit_start_time;
+
+    if (elapsed >= timeout)
+    {
+        Comm::sendStringToAllPeers(
+            "Server shutting down due to inactivity"
+        );
+
+        disarmIdleQuitTimer();
+        main_abort();
+        return;
+    }
+
+    uint64_t remaining_ms = timeout - elapsed;
+
+    int remaining_minutes =
+        static_cast<int>(
+            (remaining_ms + 59999ULL) / 60000ULL
+        );
+
+    if ((remaining_minutes == 15 ||
+        (remaining_minutes >= 1 && remaining_minutes <= 5)) &&
+        remaining_minutes != m_idle_quit_last_warning)
+    {
+        Comm::sendStringToAllPeers(
+            "Server will shut down in " +
+            std::to_string(remaining_minutes) +
+            (remaining_minutes == 1
+                ? " minute"
+                : " minutes") +
+            " if no racing activity"
+        );
+
+        m_idle_quit_last_warning = remaining_minutes;
+    }
+}

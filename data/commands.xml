@@ -1242,6 +1242,21 @@ here later. For now, please refer to the code for the strings being used. -->
                  permissions="UP_HAMMER"
         />
     </command>
+
+    <command name="idlequit"
+         usage="/idlequit"
+         description="Shows the idle quit timeout."
+         permissions="UP_EVERYONE | PE_ALLOW_ANYONE"
+         permissions-verbose="everyone">
+            <command name="="
+                     usage="/idlequit MINUTES"
+                     omit-name="true"
+                     permissions-verbose="hammers"
+                     description="Sets shutdown delay after a completed network Grand Prix. 0 disables it."
+                     permissions="UP_HAMMER"
+            />
+    </command>
+
     <command name="forcerandom"
              usage="/forcerandom"
              description="The probability with which the teams are randomly shuffled when the game starts (limited to the segment [0, 1])."

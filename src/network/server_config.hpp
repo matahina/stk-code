@@ -824,6 +824,10 @@ namespace ServerConfig
         "Timeout in seconds during which you cannot start the next game, "
         "regardless of hammers, votes, or buttons pressed."));
 
+    SERVER_CFG_PREFIX IntServerConfigParam m_idle_quit_minutes
+        SERVER_CFG_DEFAULT(IntServerConfigParam(0, "idle-quit-minutes",
+        "Stop the server after this many minutes once a network Grand Prix has finished. 0 disables it."));
+
     SERVER_CFG_PREFIX StringServerConfigParam m_reserve_slots_for_players
             SERVER_CFG_DEFAULT(StringServerConfigParam("",
             "reserve-slots-for-players",

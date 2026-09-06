@@ -90,6 +90,7 @@ void LobbySettings::setupContextUser()
     m_flag_return_timeout            = ServerConfig::m_flag_return_timeout;
     m_free_teams                     = ServerConfig::m_free_teams;
     m_prevent_team_mess              = ServerConfig::m_prevent_team_mess;
+    m_idle_quit_minutes              = ServerConfig::m_idle_quit_minutes;
     m_high_ping_workaround           = ServerConfig::m_high_ping_workaround;
     m_hit_limit                      = ServerConfig::m_hit_limit;
     m_incompatible_advice            = ServerConfig::m_incompatible_advice;
