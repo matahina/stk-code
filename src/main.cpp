@@ -1448,6 +1448,12 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     if (has_addr)
     {
         NetworkConfig::get()->setIsServer(false);
+        std::string bot_name;
+        if (CommandLine::has("--bot-name", &bot_name) && !bot_name.empty())
+        {
+            NetworkConfig::get()->setNetworkAIName(bot_name);
+        }
+
         if (CommandLine::has("--network-ai", &n))
         {
             // We need an existing current player

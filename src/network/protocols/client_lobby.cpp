@@ -460,12 +460,10 @@ void ClientLobby::update(int ticks)
             core::stringw name = player->getName();
             if (NetworkConfig::get()->isNetworkAIInstance())
             {
-                // I18N: Shown in lobby to indicate it's a bot in LAN game
-#ifdef SERVER_ONLY
-                name = L"Bot";
-#else
-                name = _("Bot");
-#endif
+                name = StringUtils::utf8ToWide(
+                    NetworkConfig::get()->getNetworkAIName()
+                );
+
                 name += core::stringw(" ") + StringUtils::toWString(i + 1);
             }
             rest->encodeString(name).

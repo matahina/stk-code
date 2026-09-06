@@ -99,6 +99,7 @@ private:
      *  connecting with 127.* or ::1/128 will be in charged of controlling the
      *  AI. */
     unsigned m_num_fixed_ai;
+    std::string m_network_ai_name;
 
     /** The LAN port on which a client is waiting for a server connection. */
     uint16_t m_client_port;
@@ -315,6 +316,15 @@ public:
     // ------------------------------------------------------------------------
     unsigned getNumFixedAI() const                   { return m_num_fixed_ai; }
     // ------------------------------------------------------------------------
+    void setNetworkAIName(const std::string& name)
+    {
+        m_network_ai_name = name;
+    }
+
+    const std::string& getNetworkAIName() const
+    {
+        return m_network_ai_name;
+    }
     static const std::vector<std::pair<std::string, int> >&
                                                         getStunList(bool ipv4);
     // ------------------------------------------------------------------------
