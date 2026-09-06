@@ -409,6 +409,9 @@ A typical current server configuration xml that fits the current code version is
     <!-- Timeout in seconds during which you cannot start the next game, regardless of hammers, votes, or buttons pressed. -->
     <lobby-cooldown value="0" />
 
+    <!-- Forbids GP races to be started if teams are messed up. -->
+    <prevent-team-mess value="true" />
+
     <!-- Official players with these usernames will be allowed to enter and take the playable slots of the server, even if the server is full. Make sure to not specify too many of them! -->
     <reserve-slots-for-players value="" />
 

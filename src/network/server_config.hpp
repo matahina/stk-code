@@ -379,6 +379,10 @@ namespace ServerConfig
         "teammate-hit-msg-prefix",
         "This string is the prefix for the messages if players hit teammates. (Make sure it ends with a whitespace if non-empty.)"));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_prevent_team_mess
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "prevent-team-mess",
+        "Prevent Grand Prix races from starting when teams are messed up."));
+
     SERVER_CFG_PREFIX IntServerConfigParam m_min_start_game_players
         SERVER_CFG_DEFAULT(IntServerConfigParam(2, "min-start-game-players",
         "Only auto start kart selection when number of "

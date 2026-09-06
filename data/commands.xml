@@ -1264,6 +1264,21 @@ here later. For now, please refer to the code for the strings being used. -->
              permissions-verbose="everyone; invokable for another player"
              state-scope="SS_ALWAYS"
     />
+    <command name="preventteammess"
+         usage="/preventteammess"
+         permissions-verbose="everyone"
+         description="Shows if team mess prevention is enabled."
+         permissions="UP_EVERYONE | PE_ALLOW_ANYONE"
+         permissions-verbose="everyone; invokable for another player"
+    >
+        <command name="="
+                 usage="/preventteammess (0 | 1)"
+                 omit-name="true"
+                 permissions-verbose="hammers"
+                 description="Toggles whether Grand Prix races are prevented from starting when teams are messed up."
+                 permissions="UP_HAMMER"
+        />
+    </command>
     <command name="network"
              usage="/network [username]"
              permissions="UP_EVERYONE | PE_ALLOW_ANYONE"

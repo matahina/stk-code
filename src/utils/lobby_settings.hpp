@@ -191,6 +191,9 @@ public:
 
     float forceRandomTeamsStart() const { return m_force_random_teams_start; }
 
+    bool isPreventTeamMess() const { return m_prevent_team_mess; }
+    void setPreventTeamMess(bool value) { m_prevent_team_mess = value; }
+
 private:
 
     int m_battle_hit_capture_limit;
@@ -280,6 +283,8 @@ private:
     SetWithFlip<std::string> m_reserve_slots_for_players;
 
     bool m_save_server_config;
+
+    bool m_prevent_team_mess;
 
     // Special, temporarily public
 public:

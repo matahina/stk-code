@@ -164,6 +164,7 @@ private:
     void process_queue_shuffle(Context& context);
     void process_allowstart(Context& context);
     void process_allowstart_assign(Context& context);
+    void process_preventteammess(Context& context);
     void process_shuffle(Context& context);
     void process_shuffle_assign(Context& context);
     void process_reverse(Context& context);

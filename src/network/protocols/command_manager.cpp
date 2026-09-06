@@ -370,6 +370,8 @@ void CommandManager::initCommands()
     applyFunctionIfPossible("reverse =", &CM::process_reverse_assign);
     applyFunctionIfPossible("timeout", &CM::process_timeout);
     applyFunctionIfPossible("team", &CM::process_team);
+    applyFunctionIfPossible("preventteammess", &CM::process_preventteammess);
+    applyFunctionIfPossible("preventteammess =", &CM::process_preventteammess);
     applyFunctionIfPossible("swapteams", &CM::process_swapteams);
     applyFunctionIfPossible("resetteams", &CM::process_resetteams);
     applyFunctionIfPossible("randomteams", &CM::process_randomteams);
@@ -2179,6 +2181,41 @@ void CommandManager::process_direction_assign(Context& context)
     Comm::sendStringToAllPeers(getSettings()->getDirectionAsString(true));
 } // process_direction_assign
 // ========================================================================
+
+void CommandManager::process_preventteammess(Context& context)
+{
+    auto& argv = context.m_argv;
+
+    // /preventteammess
+    if (argv.size() == 1)
+    {
+        context.say(
+            getSettings()->isPreventTeamMess()
+                ? "Team mess prevention is enabled"
+                : "Team mess prevention is disabled"
+        );
+        return;
+    }
+
+    // /preventteammess 0
+    // /preventteammess 1
+    if (argv.size() != 2 ||
+        !(argv[1] == "0" || argv[1] == "1"))
+    {
+        context.error();
+        return;
+    }
+
+    bool enabled = argv[1] == "1";
+
+    getSettings()->setPreventTeamMess(enabled);
+
+    Comm::sendStringToAllPeers(
+        enabled
+            ? "Team mess prevention is now enabled"
+            : "Team mess prevention is now disabled"
+    );
+}
 
 void CommandManager::process_queue(Context& context)
 {

@@ -86,6 +86,8 @@ public:
 
     void swapRedBlueTeams();
 
+    bool teamsAreMessedUp() const;
+
 private:
 
     std::string m_available_teams;
@@ -101,6 +103,7 @@ private:
     std::set<std::string> m_hammer_whitelist;
 
     std::set<std::string> m_hammer_whitelist_level_2;
+
 
 };
 

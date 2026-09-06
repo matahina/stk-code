@@ -1769,6 +1769,20 @@ void ServerLobby::startSelection(const Event *event)
         }
     }
 
+    if (getSettings()->isPreventTeamMess() &&
+    m_game_setup->isGrandPrix() &&
+    getTeamManager()->teamsAreMessedUp())
+    {
+        Comm::sendStringToAllPeers(
+            "Teams are messed up plz fix it"
+        );
+
+        resetPeersReady();
+        setInfiniteTimeout();
+        updatePlayerList();
+        return;
+    }
+
     if (!getCrownManager()->isOwnerLess() && getSettings()->hasTeamChoosing() &&
         !getSettings()->hasFreeTeams() && RaceManager::get()->teamEnabled())
     {

@@ -436,6 +436,38 @@ bool TeamManager::assignRandomTeams(int intended_number,
 }   // assignRandomTeams
 //-----------------------------------------------------------------------------
 
+bool TeamManager::teamsAreMessedUp() const
+{
+    auto players = STKHost::get()->getPlayersForNewGame();
+
+    if (players.empty())
+        return false;
+
+    int first_team = TeamUtils::NO_TEAM;
+    bool multiple_teams = false;
+
+    for (const auto& player : players)
+    {
+        int team = player->getTemporaryTeam();
+
+        // One player without team is enough to forbid start!
+        if (team == TeamUtils::NO_TEAM)
+            return true;
+
+        if (first_team == TeamUtils::NO_TEAM)
+        {
+            first_team = team;
+        }
+        else if (team != first_team)
+        {
+            multiple_teams = true;
+        }
+    }
+
+    // BAD if all players in same team.
+    return !multiple_teams;
+}
+
 std::string TeamManager::countTeamsAsString()
 {
     std::vector<int> counts(TeamUtils::getNumberOfTeams() + 1, 0);
