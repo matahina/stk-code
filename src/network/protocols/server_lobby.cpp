@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-extern void main_abort();
+#include "main_loop.hpp"
 
 #include "utils/time.hpp"
 
@@ -1008,6 +1008,7 @@ void ServerLobby::asynchronousUpdate()
                 Comm::sendStringToAllPeers(message);
             }
 
+            disarmIdleQuitTimer();
             m_state = LOAD_WORLD;
             Comm::sendMessageToPeers(load_world_message);
             // updatePlayerList so the in lobby players (if any) can see always
@@ -4703,7 +4704,8 @@ void ServerLobby::checkIdleQuitTimer()
         );
 
         disarmIdleQuitTimer();
-        main_abort();
+        if (main_loop)
+            main_loop->requestAbort();
         return;
     }
 
