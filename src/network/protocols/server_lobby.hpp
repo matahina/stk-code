@@ -209,6 +209,10 @@ private:
     bool m_idle_quit_armed = false;
     int m_idle_quit_last_warning = 0;
 
+    uint64_t m_idle_gp_start_time = 0;
+    bool m_idle_gp_armed = false;
+    int m_idle_gp_last_warning = 0;
+
 public: // I'll see if it should be private later
     void updatePlayerList(bool update_when_reset_server = false);
     void updateServerOwner(bool force = false);
@@ -292,12 +296,16 @@ private:
     bool supportsAI();
 
     void checkIdleQuitTimer();
+    void checkIdleGPTimer();
 
 public:
     void changeLimitForTournament(bool goal_target);
 
     void armIdleQuitTimer();
     void disarmIdleQuitTimer();
+
+    void armIdleGPTimer();
+    void disarmIdleGPTimer();
 private:
     bool canVote(std::shared_ptr<STKPeer> peer) const;
     bool hasHostRights(std::shared_ptr<STKPeer> peer) const;

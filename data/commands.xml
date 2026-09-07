@@ -1257,6 +1257,20 @@ here later. For now, please refer to the code for the strings being used. -->
             />
     </command>
 
+    <command name="idlegp"
+         usage="/idlegp"
+         description="Shows the unfinished GP inactivity timeout."
+         permissions="UP_EVERYONE | PE_ALLOW_ANYONE"
+         permissions-verbose="everyone">
+        <command name="="
+                 usage="/idlegp MINUTES"
+                 omit-name="true"
+                 permissions-verbose="double hammers"
+                 description="Resets an unfinished Grand Prix after MINUTES of inactivity between races. 0 disables it."
+                 permissions="UP_MANIPULATOR"
+        />
+    </command>
+
     <command name="forcerandom"
              usage="/forcerandom"
              description="The probability with which the teams are randomly shuffled when the game starts (limited to the segment [0, 1])."

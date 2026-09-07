@@ -411,6 +411,9 @@ A typical current server configuration xml that fits the current code version is
 
     <!-- Timeout in minutes before server autokills if no racing AFTER last GP finished. -->
     <idle-quit-minutes value="30" />
+    
+    <!-- Timeout in minutes after a race during GP and no more racing so GP is reset -->
+    <idle-gp-minutes value="30" />
 
     <!-- Forbids GP races to be started if teams are messed up. -->
     <prevent-team-mess value="true" />

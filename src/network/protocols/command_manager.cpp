@@ -431,6 +431,8 @@ void CommandManager::initCommands()
     applyFunctionIfPossible("cooldown =", &CM::process_cooldown_assign);
     applyFunctionIfPossible("idlequit", &CM::process_idlequit);
     applyFunctionIfPossible("idlequit =", &CM::process_idlequit);
+    applyFunctionIfPossible("idlegp", &CM::process_idlegp);
+    applyFunctionIfPossible("idlegp =", &CM::process_idlegp);
     applyFunctionIfPossible("forcerandom", &CM::process_forcerandom);
     applyFunctionIfPossible("forcerandom =", &CM::process_forcerandom_assign);
     applyFunctionIfPossible("countteams", &CM::process_countteams);
@@ -2662,6 +2664,7 @@ void CommandManager::process_resetgp(Context& context)
         getGameSetupFromCtx()->setGrandPrixTrack(number_of_games);
     }
     getGPManager()->resetGrandPrix();
+    getLobby()->disarmIdleGPTimer();
     getLobby()->armIdleQuitTimer();
     Comm::sendStringToAllPeers("GP is now reset");
 } // process_resetgp
@@ -3728,6 +3731,73 @@ void CommandManager::process_idlequit(Context& context)
     {
         Comm::sendStringToAllPeers(
             "Idle quit is now set to " +
+            std::to_string(minutes) +
+            " minute(s)"
+        );
+    }
+}
+
+void CommandManager::process_idlegp(Context& context)
+{
+    auto& argv = context.m_argv;
+
+    if (argv.size() == 1)
+    {
+        int minutes = getSettings()->getIdleGPMinutes();
+
+        if (minutes <= 0)
+        {
+            context.say("Idle GP reset is disabled");
+        }
+        else
+        {
+            context.say(
+                "Idle GP reset is set to " +
+                std::to_string(minutes) +
+                " minute(s)"
+            );
+        }
+        return;
+    }
+
+    if (argv.size() != 2)
+    {
+        context.error();
+        return;
+    }
+
+    int minutes = -1;
+
+    try
+    {
+        minutes = std::stoi(argv[1]);
+    }
+    catch (...)
+    {
+        context.error();
+        return;
+    }
+
+    if (minutes < 0)
+    {
+        context.error();
+        return;
+    }
+
+    getSettings()->setIdleGPMinutes(minutes);
+
+    if (minutes == 0)
+    {
+        getLobby()->disarmIdleGPTimer();
+
+        Comm::sendStringToAllPeers(
+            "Idle GP reset is now disabled"
+        );
+    }
+    else
+    {
+        Comm::sendStringToAllPeers(
+            "Idle GP reset is now set to " +
             std::to_string(minutes) +
             " minute(s)"
         );

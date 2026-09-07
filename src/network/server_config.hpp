@@ -828,6 +828,10 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(IntServerConfigParam(0, "idle-quit-minutes",
         "Stop the server after this many minutes once a network Grand Prix has finished. 0 disables it."));
 
+    SERVER_CFG_PREFIX IntServerConfigParam m_idle_gp_minutes
+        SERVER_CFG_DEFAULT(IntServerConfigParam(0, "idle-gp-minutes",
+        "Reset an unfinished Grand Prix after this many idle minutes between races. 0 disables it."));
+
     SERVER_CFG_PREFIX StringServerConfigParam m_reserve_slots_for_players
             SERVER_CFG_DEFAULT(StringServerConfigParam("",
             "reserve-slots-for-players",

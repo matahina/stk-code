@@ -197,6 +197,9 @@ public:
     int getIdleQuitMinutes() const { return m_idle_quit_minutes; }
     void setIdleQuitMinutes(int value) { m_idle_quit_minutes = value; }
 
+    int getIdleGPMinutes() const { return m_idle_gp_minutes; }
+    void setIdleGPMinutes(int value) { m_idle_gp_minutes = value; }
+
 private:
 
     int m_battle_hit_capture_limit;
@@ -290,6 +293,8 @@ private:
     bool m_prevent_team_mess;
 
     int m_idle_quit_minutes;
+
+    int m_idle_gp_minutes;
 
     // Special, temporarily public
 public:
