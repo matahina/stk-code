@@ -2164,6 +2164,15 @@ void ServerLobby::checkRaceFinished()
         {
             disarmIdleGPTimer();
             armIdleQuitTimer();
+
+            if (getSettings()->isAutoLockGP())
+            {
+                getSettings()->setAllowedToStart(false);
+
+                Comm::sendStringToAllPeers(
+                    getSettings()->getAllowedToStartAsString(true)
+                );
+            }
         }
         else
         {
@@ -4802,6 +4811,15 @@ void ServerLobby::checkIdleGPTimer()
 
         // A reset counts as the end of GP activity for idlequit.
         armIdleQuitTimer();
+
+        if (getSettings()->isAutoLockGP())
+        {
+            getSettings()->setAllowedToStart(false);
+
+            Comm::sendStringToAllPeers(
+                getSettings()->getAllowedToStartAsString(true)
+            );
+        }
 
         Comm::sendStringToAllPeers(
             "GP was reset due to inactivity"

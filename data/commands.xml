@@ -1265,9 +1265,22 @@ here later. For now, please refer to the code for the strings being used. -->
         <command name="="
                  usage="/idlegp MINUTES"
                  omit-name="true"
-                 permissions-verbose="double hammers"
+                 permissions-verbose="hammers"
                  description="Resets an unfinished Grand Prix after MINUTES of inactivity between races. 0 disables it."
-                 permissions="UP_MANIPULATOR"
+                 permissions="UP_HAMMER"
+        />
+    </command>
+    <command name="autolockgp"
+         usage="/autolockgp"
+         description="Shows whether race starting is automatically disabled when a GP ends or is reset."
+         permissions="UP_EVERYONE | PE_ALLOW_ANYONE"
+         permissions-verbose="everyone">
+        <command name="="
+                 usage="/autolockgp (0 | 1)"
+                 omit-name="true"
+                 permissions="UP_HAMMER"
+                 permissions-verbose="hammers"
+                 description="Toggles automatic race-start locking after a Grand Prix ends or is reset."
         />
     </command>
 

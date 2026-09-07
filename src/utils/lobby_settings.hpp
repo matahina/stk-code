@@ -200,6 +200,9 @@ public:
     int getIdleGPMinutes() const { return m_idle_gp_minutes; }
     void setIdleGPMinutes(int value) { m_idle_gp_minutes = value; }
 
+    bool isAutoLockGP() const { return m_auto_lock_gp; }
+    void setAutoLockGP(bool value) { m_auto_lock_gp = value; }
+
 private:
 
     int m_battle_hit_capture_limit;
@@ -295,6 +298,8 @@ private:
     int m_idle_quit_minutes;
 
     int m_idle_gp_minutes;
+
+    bool m_auto_lock_gp;
 
     // Special, temporarily public
 public:

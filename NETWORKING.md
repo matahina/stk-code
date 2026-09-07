@@ -408,6 +408,9 @@ A typical current server configuration xml that fits the current code version is
 
     <!-- Timeout in seconds during which you cannot start the next game, regardless of hammers, votes, or buttons pressed. -->
     <lobby-cooldown value="0" />
+    
+    <!-- Revert to /allowstart 0 when GP ended or being reset -->
+    <auto-lock-gp value="true" />
 
     <!-- Timeout in minutes before server autokills if no racing AFTER last GP finished. -->
     <idle-quit-minutes value="30" />

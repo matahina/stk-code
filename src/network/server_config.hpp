@@ -832,6 +832,10 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(IntServerConfigParam(0, "idle-gp-minutes",
         "Reset an unfinished Grand Prix after this many idle minutes between races. 0 disables it."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_auto_lock_gp
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "auto-lock-gp",
+        "Automatically disable race starting when a Grand Prix ends or is reset."));
+
     SERVER_CFG_PREFIX StringServerConfigParam m_reserve_slots_for_players
             SERVER_CFG_DEFAULT(StringServerConfigParam("",
             "reserve-slots-for-players",

@@ -364,6 +364,8 @@ void CommandManager::initCommands()
     }
     applyFunctionIfPossible("allowstart", &CM::process_allowstart);
     applyFunctionIfPossible("allowstart =", &CM::process_allowstart_assign);
+    applyFunctionIfPossible("autolockgp", &CM::process_autolockgp);
+    applyFunctionIfPossible("autolockgp =", &CM::process_autolockgp);
     applyFunctionIfPossible("shuffle", &CM::process_shuffle);
     applyFunctionIfPossible("shuffle =", &CM::process_shuffle_assign);
     applyFunctionIfPossible("reverse", &CM::process_reverse);
@@ -2666,6 +2668,16 @@ void CommandManager::process_resetgp(Context& context)
     getGPManager()->resetGrandPrix();
     getLobby()->disarmIdleGPTimer();
     getLobby()->armIdleQuitTimer();
+
+    if (getSettings()->isAutoLockGP())
+    {
+        getSettings()->setAllowedToStart(false);
+
+        Comm::sendStringToAllPeers(
+            getSettings()->getAllowedToStartAsString(true)
+        );
+    }
+
     Comm::sendStringToAllPeers("GP is now reset");
 } // process_resetgp
 // ========================================================================
@@ -3804,6 +3816,37 @@ void CommandManager::process_idlegp(Context& context)
     }
 }
 
+void CommandManager::process_autolockgp(Context& context)
+{
+    auto& argv = context.m_argv;
+
+    if (argv.size() == 1)
+    {
+        context.say(
+            getSettings()->isAutoLockGP()
+                ? "Automatic GP start locking is enabled"
+                : "Automatic GP start locking is disabled"
+        );
+        return;
+    }
+
+    if (argv.size() != 2 ||
+        !(argv[1] == "0" || argv[1] == "1"))
+    {
+        context.error();
+        return;
+    }
+
+    bool enabled = argv[1] == "1";
+    getSettings()->setAutoLockGP(enabled);
+
+    Comm::sendStringToAllPeers(
+        enabled
+            ? "Automatic GP start locking is now enabled"
+            : "Automatic GP start locking is now disabled"
+    );
+}
+
 void CommandManager::process_forcerandom(Context& context)
 {
     context.say(StringUtils::insertValues(
@@ -4185,3 +4228,4 @@ std::function<void(Context&)> CommandManager::getDefaultAction()
     return std::bind(&CommandManager::special, this, std::placeholders::_1);
 }   // getDefaultAction
 //-----------------------------------------------------------------------------
+
