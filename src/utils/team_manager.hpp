@@ -87,6 +87,7 @@ public:
     void swapRedBlueTeams();
 
     bool teamsAreMessedUp() const;
+    bool preventMessedUpTeamStart() const;
 
 private:
 

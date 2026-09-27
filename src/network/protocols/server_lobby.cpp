@@ -1809,14 +1809,8 @@ void ServerLobby::startSelection(const Event *event)
         }
     }
 
-    if (getSettings()->isPreventTeamMess() &&
-    m_game_setup->isGrandPrix() &&
-    getTeamManager()->teamsAreMessedUp())
+    if (getTeamManager()->preventMessedUpTeamStart())
     {
-        Comm::sendStringToAllPeers(
-            "Teams are messed up plz fix it"
-        );
-
         resetPeersReady();
         setInfiniteTimeout();
         updatePlayerList();

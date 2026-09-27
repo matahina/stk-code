@@ -31,6 +31,9 @@
 #include "utils/team_utils.hpp"
 #include "utils/tournament.hpp"
 
+#include "network/game_setup.hpp"
+#include "utils/communication.hpp"
+
 #include <random>
 
 namespace
@@ -475,6 +478,24 @@ bool TeamManager::teamsAreMessedUp() const
         return false;
 
     return !multiple_teams;
+}
+
+bool TeamManager::preventMessedUpTeamStart() const
+{
+    if (!getSettings()->isPreventTeamMess())
+        return false;
+
+    if (!getGameSetupFromCtx()->isGrandPrix())
+        return false;
+
+    if (!teamsAreMessedUp())
+        return false;
+
+    Comm::sendStringToAllPeers(
+        "Teams are messed up plz fix it"
+    );
+
+    return true;
 }
 
 std::string TeamManager::countTeamsAsString()
