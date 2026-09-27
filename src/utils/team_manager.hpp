@@ -105,7 +105,6 @@ private:
 
     std::set<std::string> m_hammer_whitelist_level_2;
 
-
 };
 
 #endif // TEAM_MANAGER_HPP

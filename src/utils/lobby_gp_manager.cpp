@@ -295,7 +295,6 @@ std::string LobbyGPManager::getScoringAsString()
 }   // getScoringAsString
 //-----------------------------------------------------------------------------
 
-
 void LobbyGPManager::armIdleQuitTimer()
 {
     int minutes = getSettings()->getIdleQuitMinutes();
@@ -323,7 +322,6 @@ void LobbyGPManager::disarmIdleQuitTimer()
     m_idle_quit_start_time = 0;
     m_idle_quit_last_warning = 0;
 }
-
 
 void LobbyGPManager::checkIdleQuitTimer()
 {

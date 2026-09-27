@@ -153,7 +153,7 @@ public:
     }
     // ------------------------------------------------------------------------
     /** Returns the name of this player. */
-    const irr::core::stringw& getName() const { return m_player_name; }
+    const irr::core::stringw& getName() const         { return m_player_name; }
     // ------------------------------------------------------------------------
     float getDefaultKartColor() const
     {

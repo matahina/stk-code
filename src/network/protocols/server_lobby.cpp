@@ -16,8 +16,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "utils/time.hpp"
-
 #include "network/protocols/server_lobby.hpp"
 
 #include "items/network_item_manager.hpp"
@@ -621,7 +619,6 @@ void ServerLobby::writePlayerReport(Event* event)
 /** Find out the public IP server or poll STK server asynchronously. */
 void ServerLobby::asynchronousUpdate()
 {
-
     getGPManager()->checkIdleQuitTimer();
     getGPManager()->checkIdleGPTimer();
 
@@ -3046,6 +3043,7 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
     delete pl;
 }   // updatePlayerList
 //-----------------------------------------------------------------------------
+
 void ServerLobby::updateServerOwner(bool force)
 {
     ServerState state = m_state.load();
@@ -4642,5 +4640,3 @@ void ServerLobby::onSpectatorStatusChange(const std::shared_ptr<STKPeer>& peer)
     }
 }   // onSpectatorStatusChange
 //-----------------------------------------------------------------------------
-
-

@@ -1448,7 +1448,6 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     if (has_addr)
     {
         NetworkConfig::get()->setIsServer(false);
-
         if (CommandLine::has("--network-ai", &n))
         {
             // We need an existing current player

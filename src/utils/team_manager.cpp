@@ -439,7 +439,6 @@ bool TeamManager::assignRandomTeams(int intended_number,
 }   // assignRandomTeams
 //-----------------------------------------------------------------------------
 
-
 bool TeamManager::teamsAreMessedUp() const
 {
     auto players = STKHost::get()->getPlayersForNewGame();
@@ -464,13 +463,9 @@ bool TeamManager::teamsAreMessedUp() const
             return true;
 
         if (first_team == TeamUtils::NO_TEAM)
-        {
             first_team = team;
-        }
         else if (team != first_team)
-        {
             multiple_teams = true;
-        }
     }
 
     // No actual racers -> don't consider the teams messed up.
