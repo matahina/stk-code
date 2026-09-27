@@ -2723,6 +2723,23 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         getTeamManager()->setTemporaryTeamInLobby(player, player->getTemporaryTeam());
     }
 
+    if (peer->isAIPeer())
+    {
+        auto& profiles = peer->getPlayerProfiles();
+
+        for (unsigned i = 0; i < profiles.size(); i++)
+        {
+            core::stringw name = StringUtils::utf8ToWide(
+                getSettings()->getBotName()
+            );
+
+            name += core::stringw(" ") +
+                StringUtils::toWString(i + 1);
+
+            profiles[i]->setName(name);
+        }
+    }
+
     peer->setValidated(true);
 
     // send a message to the one that asked to connect
@@ -3035,23 +3052,27 @@ void ServerLobby::updateAIProfileNames()
         getSettings()->getBotName()
     );
 
-    unsigned index = 1;
-
     if (auto ai = m_ai_peer.lock())
     {
-        for (auto& profile : ai->getPlayerProfiles())
+        auto& profiles = ai->getPlayerProfiles();
+
+        for (unsigned i = 0; i < profiles.size(); i++)
         {
             core::stringw name = base_name;
-            name += core::stringw(" ") + StringUtils::toWString(index++);
-            profile->setName(name);
+            name += core::stringw(" ") +
+                StringUtils::toWString(i + 1);
+
+            profiles[i]->setName(name);
         }
     }
 
-    for (auto& profile : m_ai_profiles)
+    for (unsigned i = 0; i < m_ai_profiles.size(); i++)
     {
         core::stringw name = base_name;
-        name += core::stringw(" ") + StringUtils::toWString(index++);
-        profile->setName(name);
+        name += core::stringw(" ") +
+            StringUtils::toWString(i + 1);
+
+        m_ai_profiles[i]->setName(name);
     }
 
     updatePlayerList();
