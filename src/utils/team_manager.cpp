@@ -436,21 +436,27 @@ bool TeamManager::assignRandomTeams(int intended_number,
 }   // assignRandomTeams
 //-----------------------------------------------------------------------------
 
+
 bool TeamManager::teamsAreMessedUp() const
 {
     auto players = STKHost::get()->getPlayersForNewGame();
 
-    if (players.empty())
-        return false;
-
     int first_team = TeamUtils::NO_TEAM;
     bool multiple_teams = false;
+    bool has_player = false;
 
     for (const auto& player : players)
     {
+        auto peer = player->getPeer();
+
+        // Spectators don't participate in the next race.
+        if (peer && peer->alwaysSpectate())
+            continue;
+
+        has_player = true;
+
         int team = player->getTemporaryTeam();
 
-        // One player without team is enough to forbid start!
         if (team == TeamUtils::NO_TEAM)
             return true;
 
@@ -464,7 +470,10 @@ bool TeamManager::teamsAreMessedUp() const
         }
     }
 
-    // BAD if all players in same team.
+    // No actual racers -> don't consider the teams messed up.
+    if (!has_player)
+        return false;
+
     return !multiple_teams;
 }
 
