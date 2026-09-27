@@ -3046,44 +3046,6 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
     delete pl;
 }   // updatePlayerList
 //-----------------------------------------------------------------------------
-void ServerLobby::updateAIProfileNames()
-{
-    const core::stringw base_name = StringUtils::utf8ToWide(
-        getSettings()->getBotName()
-    );
-
-    if (auto ai = m_ai_peer.lock())
-    {
-        auto& profiles = ai->getPlayerProfiles();
-
-        for (unsigned i = 0; i < profiles.size(); i++)
-        {
-            core::stringw name = base_name;
-            name += core::stringw(" ") +
-                StringUtils::toWString(i + 1);
-
-            profiles[i]->setName(name);
-        }
-    }
-
-    for (unsigned i = 0; i < m_ai_profiles.size(); i++)
-    {
-        core::stringw name = base_name;
-        name += core::stringw(" ") +
-            StringUtils::toWString(i + 1);
-
-        m_ai_profiles[i]->setName(name);
-    }
-
-    updatePlayerList();
-}   // updateAIProfileNames
-//-----------------------------------------------------------------------------
-void ServerLobby::setBotName(const std::string& name)
-{
-    getSettings()->setBotName(name);
-    updateAIProfileNames();
-}   // setBotName
-//-----------------------------------------------------------------------------
 void ServerLobby::updateServerOwner(bool force)
 {
     ServerState state = m_state.load();

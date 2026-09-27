@@ -4254,7 +4254,7 @@ void CommandManager::process_botname_assign(Context& context)
         return;
     }
 
-    getLobby()->setBotName(name);
+    getSettings()->setBotName(name);
 
     context.say(
         "Bot name is now \"" + name + "\""
