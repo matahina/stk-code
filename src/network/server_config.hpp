@@ -383,6 +383,10 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "prevent-team-mess",
         "Prevent Grand Prix races from starting when teams are messed up."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_output_track_info
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "output-track-info",
+        "Output the track name and designer when a race starts."));
+
     SERVER_CFG_PREFIX IntServerConfigParam m_min_start_game_players
         SERVER_CFG_DEFAULT(IntServerConfigParam(2, "min-start-game-players",
         "Only auto start kart selection when number of "

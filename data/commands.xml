@@ -1394,4 +1394,17 @@ here later. For now, please refer to the code for the strings being used. -->
                  permissions="UP_HAMMER"
         />
     </command>
+    <command name="outputtrackinfo"
+         usage="/outputtrackinfo"
+         description="Shows whether track information output is enabled."
+         permissions="UP_EVERYONE | PE_ALLOW_ANYONE"
+    >
+        <command name="="
+                 usage="/outputtrackinfo (0 | 1)"
+                 omit-name="true"
+                 permissions-verbose="hammers"
+                 description="Enables or disables track information output."
+                 permissions="UP_HAMMER"
+        />
+    </command>
 </commands>

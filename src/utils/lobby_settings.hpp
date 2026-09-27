@@ -194,6 +194,9 @@ public:
     bool isPreventTeamMess() const { return m_prevent_team_mess; }
     void setPreventTeamMess(bool value) { m_prevent_team_mess = value; }
 
+    bool isOutputTrackInfo() const { return m_output_track_info; }
+    void setOutputTrackInfo(bool value) { m_output_track_info = value; }
+
     int getIdleQuitMinutes() const { return m_idle_quit_minutes; }
     void setIdleQuitMinutes(int value) { m_idle_quit_minutes = value; }
 
@@ -297,6 +300,8 @@ private:
     bool m_save_server_config;
 
     bool m_prevent_team_mess;
+
+    bool m_output_track_info;
 
     int m_idle_quit_minutes;
 

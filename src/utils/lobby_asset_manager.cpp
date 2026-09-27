@@ -792,6 +792,9 @@ std::vector<std::string> LobbyAssetManager::getMissingAssets(
 
 void LobbyAssetManager::broadcastTrackInfo(const std::string& track_ident)
 {
+    if (!getSettings()->isOutputTrackInfo())
+        return;
+
     Track* track = TrackManager::get()->getTrack(track_ident);
 
     if (!track)

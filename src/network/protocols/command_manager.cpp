@@ -311,6 +311,8 @@ void CommandManager::initCommands()
     applyFunctionIfPossible("config", &CM::process_config);
     applyFunctionIfPossible("config =", &CM::process_config_assign);
     applyFunctionIfPossible("spectate", &CM::process_spectate);
+    applyFunctionIfPossible("outputtrackinfo", &CM::process_outputtrackinfo);
+    applyFunctionIfPossible("outputtrackinfo =", &CM::process_outputtrackinfo_assign);
     applyFunctionIfPossible("addons", &CM::process_addons);
     applyFunctionIfPossible("moreaddons", &CM::process_addons);
     applyFunctionIfPossible("getaddons", &CM::process_addons);
@@ -4260,3 +4262,40 @@ void CommandManager::process_botname_assign(Context& context)
         "Bot name is now \"" + name + "\""
     );
 } // process_botname_assign
+// ========================================================================
+void CommandManager::process_outputtrackinfo(Context& context)
+{
+    context.say(
+        getSettings()->isOutputTrackInfo()
+            ? "Track info output is enabled"
+            : "Track info output is disabled"
+    );
+} // process_outputtrackinfo
+// ========================================================================
+void CommandManager::process_outputtrackinfo_assign(Context& context)
+{
+    auto& argv = context.m_argv;
+
+    if (argv.size() < 2)
+    {
+        context.error();
+        return;
+    }
+
+    int value;
+
+    if (!StringUtils::fromString(argv[1], value) ||
+        (value != 0 && value != 1))
+    {
+        context.error();
+        return;
+    }
+
+    getSettings()->setOutputTrackInfo(value == 1);
+
+    context.say(
+        getSettings()->isOutputTrackInfo()
+            ? "Track info output is now enabled"
+            : "Track info output is now disabled"
+    );
+} // process_outputtrackinfo_assign

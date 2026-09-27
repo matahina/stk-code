@@ -91,6 +91,7 @@ void LobbySettings::setupContextUser()
     m_flag_return_timeout            = ServerConfig::m_flag_return_timeout;
     m_free_teams                     = ServerConfig::m_free_teams;
     m_prevent_team_mess              = ServerConfig::m_prevent_team_mess;
+    m_output_track_info              = ServerConfig::m_output_track_info;
     m_idle_quit_minutes              = ServerConfig::m_idle_quit_minutes;
     m_idle_gp_minutes                = ServerConfig::m_idle_gp_minutes;
     m_auto_lock_gp                   = ServerConfig::m_auto_lock_gp;
