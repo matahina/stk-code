@@ -77,7 +77,24 @@ public:
         gp_data.setGPSlot(i);
     }
 
+    void checkIdleQuitTimer();
+    void checkIdleGPTimer();
+    void armIdleQuitTimer();
+    void disarmIdleQuitTimer();
+    void armIdleGPTimer();
+    void disarmIdleGPTimer();
+
+    void autoLockGP();
+
 private:
+    uint64_t m_idle_quit_start_time = 0;
+    bool m_idle_quit_armed = false;
+    int m_idle_quit_last_warning = 0;
+
+    uint64_t m_idle_gp_start_time = 0;
+    bool m_idle_gp_armed = false;
+    int m_idle_gp_last_warning = 0;
+
     struct GrandPrixSlot {
         std::map<std::string, GPScore> m_gp_scores;
         std::map<int, GPScore> m_gp_team_scores;

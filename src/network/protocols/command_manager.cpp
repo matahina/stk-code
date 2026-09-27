@@ -2666,17 +2666,10 @@ void CommandManager::process_resetgp(Context& context)
         getGameSetupFromCtx()->setGrandPrixTrack(number_of_games);
     }
     getGPManager()->resetGrandPrix();
-    getLobby()->disarmIdleGPTimer();
-    getLobby()->armIdleQuitTimer();
+    getGPManager()->disarmIdleGPTimer();
+    getGPManager()->armIdleQuitTimer();
 
-    if (getSettings()->isAutoLockGP())
-    {
-        getSettings()->setAllowedToStart(false);
-
-        Comm::sendStringToAllPeers(
-            getSettings()->getAllowedToStartAsString(true)
-        );
-    }
+    getGPManager()->autoLockGP();
 
     Comm::sendStringToAllPeers("GP is now reset");
 } // process_resetgp
@@ -3733,7 +3726,7 @@ void CommandManager::process_idlequit(Context& context)
 
     if (minutes == 0)
     {
-        getLobby()->disarmIdleQuitTimer();
+        getGPManager()->disarmIdleQuitTimer();
 
         Comm::sendStringToAllPeers(
             "Idle quit is now disabled"
@@ -3800,7 +3793,7 @@ void CommandManager::process_idlegp(Context& context)
 
     if (minutes == 0)
     {
-        getLobby()->disarmIdleGPTimer();
+        getGPManager()->disarmIdleGPTimer();
 
         Comm::sendStringToAllPeers(
             "Idle GP reset is now disabled"

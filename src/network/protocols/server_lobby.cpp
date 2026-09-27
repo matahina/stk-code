@@ -16,8 +16,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "main_loop.hpp"
-
 #include "utils/time.hpp"
 
 #include "network/protocols/server_lobby.hpp"
@@ -624,8 +622,8 @@ void ServerLobby::writePlayerReport(Event* event)
 void ServerLobby::asynchronousUpdate()
 {
 
-    checkIdleQuitTimer();
-    checkIdleGPTimer();
+    getGPManager()->checkIdleQuitTimer();
+    getGPManager()->checkIdleGPTimer();
 
     if (m_rs_state.load() == RS_ASYNC_RESET)
     {
@@ -1009,8 +1007,8 @@ void ServerLobby::asynchronousUpdate()
                 Comm::sendStringToAllPeers(message);
             }
 
-            disarmIdleQuitTimer();
-            disarmIdleGPTimer();
+            getGPManager()->disarmIdleQuitTimer();
+            getGPManager()->disarmIdleGPTimer();
 
             m_state = LOAD_WORLD;
             Comm::sendMessageToPeers(load_world_message);
@@ -2156,21 +2154,14 @@ void ServerLobby::checkRaceFinished()
 
         if (gp_finished)
         {
-            disarmIdleGPTimer();
-            armIdleQuitTimer();
+            getGPManager()->disarmIdleGPTimer();
+            getGPManager()->armIdleQuitTimer();
 
-            if (getSettings()->isAutoLockGP())
-            {
-                getSettings()->setAllowedToStart(false);
-
-                Comm::sendStringToAllPeers(
-                    getSettings()->getAllowedToStartAsString(true)
-                );
-            }
+            getGPManager()->autoLockGP();
         }
         else
         {
-            armIdleGPTimer();
+            getGPManager()->armIdleGPTimer();
         }
     }
     else if (RaceManager::get()->modeHasLaps())
@@ -4661,189 +4652,4 @@ void ServerLobby::onSpectatorStatusChange(const std::shared_ptr<STKPeer>& peer)
 }   // onSpectatorStatusChange
 //-----------------------------------------------------------------------------
 
-void ServerLobby::armIdleQuitTimer()
-{
-    int minutes = getSettings()->getIdleQuitMinutes();
 
-    if (minutes <= 0)
-    {
-        m_idle_quit_armed = false;
-        return;
-    }
-
-    m_idle_quit_start_time = StkTime::getMonoTimeMs();
-    m_idle_quit_last_warning = 0;
-    m_idle_quit_armed = true;
-
-    Log::info(
-        "ServerLobby",
-        "Idle quit timer armed for %d minute(s).",
-        minutes
-    );
-}
-
-void ServerLobby::disarmIdleQuitTimer()
-{
-    m_idle_quit_armed = false;
-    m_idle_quit_start_time = 0;
-    m_idle_quit_last_warning = 0;
-}
-
-
-void ServerLobby::checkIdleQuitTimer()
-{
-    if (!m_idle_quit_armed)
-        return;
-
-    int minutes = getSettings()->getIdleQuitMinutes();
-
-    if (minutes <= 0)
-    {
-        disarmIdleQuitTimer();
-        return;
-    }
-
-    uint64_t now = StkTime::getMonoTimeMs();
-
-    uint64_t timeout =
-        static_cast<uint64_t>(minutes) * 60ULL * 1000ULL;
-
-    uint64_t elapsed =
-        now - m_idle_quit_start_time;
-
-    if (elapsed >= timeout)
-    {
-        Comm::sendStringToAllPeers(
-            "Server shutting down due to inactivity"
-        );
-
-        disarmIdleQuitTimer();
-        if (main_loop)
-            main_loop->requestAbort();
-        return;
-    }
-
-    uint64_t remaining_ms = timeout - elapsed;
-
-    int remaining_minutes =
-        static_cast<int>(
-            (remaining_ms + 59999ULL) / 60000ULL
-        );
-
-    if ((remaining_minutes == 15 ||
-        (remaining_minutes >= 1 && remaining_minutes <= 5)) &&
-        remaining_minutes != m_idle_quit_last_warning)
-    {
-        Comm::sendStringToAllPeers(
-            "Server will shut down in " +
-            std::to_string(remaining_minutes) +
-            (remaining_minutes == 1
-                ? " minute"
-                : " minutes") +
-            " if no racing activity"
-        );
-
-        m_idle_quit_last_warning = remaining_minutes;
-    }
-}
-
-void ServerLobby::armIdleGPTimer()
-{
-    int minutes = getSettings()->getIdleGPMinutes();
-
-    if (minutes <= 0)
-    {
-        m_idle_gp_armed = false;
-        return;
-    }
-
-    m_idle_gp_start_time = StkTime::getMonoTimeMs();
-    m_idle_gp_last_warning = 0;
-    m_idle_gp_armed = true;
-
-    Log::info(
-        "ServerLobby",
-        "Idle GP timer armed for %d minute(s).",
-        minutes
-    );
-}
-
-void ServerLobby::disarmIdleGPTimer()
-{
-    m_idle_gp_armed = false;
-    m_idle_gp_start_time = 0;
-    m_idle_gp_last_warning = 0;
-}
-
-void ServerLobby::checkIdleGPTimer()
-{
-    if (!m_idle_gp_armed)
-        return;
-
-    int minutes = getSettings()->getIdleGPMinutes();
-
-    if (minutes <= 0)
-    {
-        disarmIdleGPTimer();
-        return;
-    }
-
-    uint64_t now = StkTime::getMonoTimeMs();
-
-    uint64_t timeout =
-        static_cast<uint64_t>(minutes) * 60ULL * 1000ULL;
-
-    uint64_t elapsed =
-        now - m_idle_gp_start_time;
-
-    // Timeout reached: reset the unfinished GP.
-    if (elapsed >= timeout)
-    {
-        disarmIdleGPTimer();
-
-        getGPManager()->resetGrandPrix();
-
-        // A reset counts as the end of GP activity for idlequit.
-        armIdleQuitTimer();
-
-        if (getSettings()->isAutoLockGP())
-        {
-            getSettings()->setAllowedToStart(false);
-
-            Comm::sendStringToAllPeers(
-                getSettings()->getAllowedToStartAsString(true)
-            );
-        }
-
-        Comm::sendStringToAllPeers(
-            "GP was reset due to inactivity"
-        );
-
-        return;
-    }
-
-    uint64_t remaining_ms = timeout - elapsed;
-
-    // Round up so e.g. 4:59 remaining is announced as 5 minutes.
-    int remaining_minutes =
-        static_cast<int>(
-            (remaining_ms + 59999ULL) / 60000ULL
-        );
-
-    // Warnings at 10, 5, 4, 3, 2 and 1 minute(s).
-    if ((remaining_minutes == 10 ||
-         (remaining_minutes >= 1 && remaining_minutes <= 5)) &&
-        remaining_minutes != m_idle_gp_last_warning)
-    {
-        Comm::sendStringToAllPeers(
-            "GP will be reset in " +
-            std::to_string(remaining_minutes) +
-            (remaining_minutes == 1
-                ? " minute"
-                : " minutes") +
-            " if the next race is not started"
-        );
-
-        m_idle_gp_last_warning = remaining_minutes;
-    }
-}
