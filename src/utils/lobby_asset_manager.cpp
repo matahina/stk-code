@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "utils/lobby_asset_manager.hpp"
+#include "utils/communication.hpp"
 
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -787,4 +788,34 @@ std::vector<std::string> LobbyAssetManager::getMissingAssets(
             ans.push_back(required_track);
     return ans;
 }   // getMissingAssets
+//-----------------------------------------------------------------------------
+
+void LobbyAssetManager::broadcastTrackInfo(const std::string& track_ident)
+{
+    Track* track = TrackManager::get()->getTrack(track_ident);
+
+    if (!track)
+        return;
+
+    std::string track_name = track->getUntranslatedName();
+
+    size_t separator = track_name.find('|');
+    if (separator != std::string::npos)
+        track_name = track_name.substr(0, separator);
+
+    std::string designer =
+        StringUtils::wideToUtf8(track->getDesigner());
+
+    std::string message = "Track: ";
+
+    if (track->isAddon())
+        message += "🧩 ";
+
+    message += track_name;
+
+    if (!designer.empty())
+        message += " | Designer: " + designer;
+
+    Comm::sendStringToAllPeers(message);
+}   // broadcastTrackInfo
 //-----------------------------------------------------------------------------

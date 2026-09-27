@@ -50,6 +50,8 @@ public:
     bool tryApplyingMapFilters();
     std::string getRandomAvailableMap();
 
+    void broadcastTrackInfo(const std::string& track_ident);
+
     void encodePlayerKartsAndCommonMaps(
             NetworkString* ns, const std::set<std::string>& all_k);
 
