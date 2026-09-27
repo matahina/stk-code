@@ -83,6 +83,7 @@ void LobbySettings::setupContextUser()
 
     m_ai_anywhere                    = ServerConfig::m_ai_anywhere;
     m_ai_handling                    = ServerConfig::m_ai_handling;
+    m_bot_name                       = ServerConfig::m_bot_name;
     m_capture_limit                  = ServerConfig::m_capture_limit;
     m_expose_mobile                  = ServerConfig::m_expose_mobile;
     m_firewalled_server              = ServerConfig::m_firewalled_server;

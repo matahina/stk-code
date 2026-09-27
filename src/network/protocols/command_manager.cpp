@@ -364,6 +364,8 @@ void CommandManager::initCommands()
     }
     applyFunctionIfPossible("allowstart", &CM::process_allowstart);
     applyFunctionIfPossible("allowstart =", &CM::process_allowstart_assign);
+    applyFunctionIfPossible("botname", &CM::process_botname);
+    applyFunctionIfPossible("botname =", &CM::process_botname_assign);
     applyFunctionIfPossible("autolockgp", &CM::process_autolockgp);
     applyFunctionIfPossible("autolockgp =", &CM::process_autolockgp);
     applyFunctionIfPossible("shuffle", &CM::process_shuffle);
@@ -4222,3 +4224,39 @@ std::function<void(Context&)> CommandManager::getDefaultAction()
 }   // getDefaultAction
 //-----------------------------------------------------------------------------
 
+
+void CommandManager::process_botname(Context& context)
+{
+    context.say(
+        "Bot name is \"" + getSettings()->getBotName() + "\""
+    );
+} // process_botname
+// ========================================================================
+
+void CommandManager::process_botname_assign(Context& context)
+{
+    auto& argv = context.m_argv;
+
+    if (argv.size() < 2)
+    {
+        context.error();
+        return;
+    }
+
+    std::string name;
+    StringUtils::restoreCmdFromArgv(
+        name, argv, ' ', '"', '"', '\\', 1
+    );
+
+    if (name.empty())
+    {
+        context.error();
+        return;
+    }
+
+    getLobby()->setBotName(name);
+
+    context.say(
+        "Bot name is now \"" + name + "\""
+    );
+} // process_botname_assign

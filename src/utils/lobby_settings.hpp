@@ -203,6 +203,9 @@ public:
     bool isAutoLockGP() const { return m_auto_lock_gp; }
     void setAutoLockGP(bool value) { m_auto_lock_gp = value; }
 
+    const std::string& getBotName() const { return m_bot_name; }
+    void setBotName(const std::string& name) { m_bot_name = name; }
+
 private:
 
     int m_battle_hit_capture_limit;
@@ -300,6 +303,8 @@ private:
     int m_idle_gp_minutes;
 
     bool m_auto_lock_gp;
+
+    std::string m_bot_name;
 
     // Special, temporarily public
 public:

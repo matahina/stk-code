@@ -1381,4 +1381,17 @@ here later. For now, please refer to the code for the strings being used. -->
              permissions-verbose="everyone (client command)"
              description="Displays locally installed addons by the substring of the identifier."
     />
+    <command name="botname"
+             usage="/botname"
+             description="Shows the current bot name."
+             permissions="UP_EVERYONE | PE_ALLOW_ANYONE"
+    >
+        <command name="="
+                 usage="/botname NAME"
+                 omit-name="true"
+                 permissions-verbose="hammers"
+                 description="Changes the bot name."
+                 permissions="UP_HAMMER"
+        />
+    </command>
 </commands>

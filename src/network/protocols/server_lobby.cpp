@@ -2772,11 +2772,11 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         }
         for (unsigned i = 0; i < ai_add; i++)
         {
-#ifdef SERVER_ONLY
-            core::stringw name = L"Bot";
-#else
-            core::stringw name = _("Bot");
-#endif
+
+            core::stringw name = StringUtils::utf8ToWide(
+                getSettings()->getBotName()
+            );
+
             name += core::stringw(" ") + StringUtils::toWString(i + 1);
             
             m_ai_profiles.push_back(std::make_shared<NetworkPlayerProfile>
@@ -3029,7 +3029,40 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
     delete pl;
 }   // updatePlayerList
 //-----------------------------------------------------------------------------
+void ServerLobby::updateAIProfileNames()
+{
+    const core::stringw base_name = StringUtils::utf8ToWide(
+        getSettings()->getBotName()
+    );
 
+    unsigned index = 1;
+
+    if (auto ai = m_ai_peer.lock())
+    {
+        for (auto& profile : ai->getPlayerProfiles())
+        {
+            core::stringw name = base_name;
+            name += core::stringw(" ") + StringUtils::toWString(index++);
+            profile->setName(name);
+        }
+    }
+
+    for (auto& profile : m_ai_profiles)
+    {
+        core::stringw name = base_name;
+        name += core::stringw(" ") + StringUtils::toWString(index++);
+        profile->setName(name);
+    }
+
+    updatePlayerList();
+}   // updateAIProfileNames
+//-----------------------------------------------------------------------------
+void ServerLobby::setBotName(const std::string& name)
+{
+    getSettings()->setBotName(name);
+    updateAIProfileNames();
+}   // setBotName
+//-----------------------------------------------------------------------------
 void ServerLobby::updateServerOwner(bool force)
 {
     ServerState state = m_state.load();

@@ -205,6 +205,8 @@ private:
     void unregisterServer(bool now,
         std::weak_ptr<ServerLobby> sl = std::weak_ptr<ServerLobby>());
 
+    void updateAIProfileNames();
+
 public: // I'll see if it should be private later
     void updatePlayerList(bool update_when_reset_server = false);
     void updateServerOwner(bool force = false);
@@ -303,6 +305,8 @@ public:
     virtual void setup() OVERRIDE;
     virtual void update(int ticks) OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
+
+    void setBotName(const std::string& name);
 
     void startSelection(const Event *event=NULL);
     void checkIncomingConnectionRequests();

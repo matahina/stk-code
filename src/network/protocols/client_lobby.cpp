@@ -460,10 +460,11 @@ void ClientLobby::update(int ticks)
             core::stringw name = player->getName();
             if (NetworkConfig::get()->isNetworkAIInstance())
             {
-                name = StringUtils::utf8ToWide(
-                    NetworkConfig::get()->getNetworkAIName()
-                );
-
+#ifdef SERVER_ONLY
+                name = L"Bot";
+#else
+                name = _("Bot");
+#endif
                 name += core::stringw(" ") + StringUtils::toWString(i + 1);
             }
             rest->encodeString(name).

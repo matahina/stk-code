@@ -146,8 +146,14 @@ public:
     // ------------------------------------------------------------------------
     void setHandicap(HandicapLevel h) { m_handicap.store(h); }
     // ------------------------------------------------------------------------
+    /** Sets the name of this player. */
+    void setName(const irr::core::stringw& name)
+    {
+        m_player_name = name;
+    }
+    // ------------------------------------------------------------------------
     /** Returns the name of this player. */
-    const irr::core::stringw& getName() const         { return m_player_name; }
+    const irr::core::stringw& getName() const { return m_player_name; }
     // ------------------------------------------------------------------------
     float getDefaultKartColor() const
     {
