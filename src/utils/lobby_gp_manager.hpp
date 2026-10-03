@@ -87,6 +87,9 @@ public:
     bool updateIdleQuitTimerSetting();
     bool updateIdleGPTimerSetting();
 
+    int getIdleQuitRemainingMinutes() const;
+    int getIdleGPRemainingMinutes() const;
+
     void autoLockGP();
 
 private:

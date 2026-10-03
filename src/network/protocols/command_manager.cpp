@@ -3693,11 +3693,22 @@ void CommandManager::process_idlequit(Context& context)
         }
         else
         {
-            context.say(
+            std::string message =
                 "Idle quit is set to " +
                 std::to_string(minutes) +
-                " minute(s)"
-            );
+                " minute(s)";
+
+            int remaining =
+                getGPManager()->getIdleQuitRemainingMinutes();
+
+            if (remaining >= 0)
+            {
+                message += ", " +
+                    std::to_string(remaining) +
+                    " minute(s) remaining";
+            }
+
+            context.say(message);
         }
         return;
     }
@@ -3727,7 +3738,7 @@ void CommandManager::process_idlequit(Context& context)
     }
 
     getSettings()->setIdleQuitMinutes(minutes);
-    getGPManager()->updateIdleGPTimerSetting();
+    getGPManager()->updateIdleQuitTimerSetting();
 
     if (minutes == 0)
     {
@@ -3759,11 +3770,22 @@ void CommandManager::process_idlegp(Context& context)
         }
         else
         {
-            context.say(
+            std::string message =
                 "Idle GP reset is set to " +
                 std::to_string(minutes) +
-                " minute(s)"
-            );
+                " minute(s)";
+
+            int remaining =
+                getGPManager()->getIdleGPRemainingMinutes();
+
+            if (remaining >= 0)
+            {
+                message += ", " +
+                    std::to_string(remaining) +
+                    " minute(s) remaining";
+            }
+
+            context.say(message);
         }
         return;
     }

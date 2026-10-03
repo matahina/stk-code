@@ -531,3 +531,49 @@ void LobbyGPManager::autoLockGP()
         getSettings()->getAllowedToStartAsString(true)
     );
 }
+
+int LobbyGPManager::getIdleQuitRemainingMinutes() const
+{
+    if (!m_idle_quit_armed)
+        return -1;
+
+    int minutes = getSettings()->getIdleQuitMinutes();
+    if (minutes <= 0)
+        return -1;
+
+    uint64_t timeout =
+        static_cast<uint64_t>(minutes) * 60ULL * 1000ULL;
+
+    uint64_t elapsed =
+        StkTime::getMonoTimeMs() - m_idle_quit_start_time;
+
+    if (elapsed >= timeout)
+        return 0;
+
+    return static_cast<int>(
+        (timeout - elapsed + 59999ULL) / 60000ULL
+    );
+}
+
+int LobbyGPManager::getIdleGPRemainingMinutes() const
+{
+    if (!m_idle_gp_armed)
+        return -1;
+
+    int minutes = getSettings()->getIdleGPMinutes();
+    if (minutes <= 0)
+        return -1;
+
+    uint64_t timeout =
+        static_cast<uint64_t>(minutes) * 60ULL * 1000ULL;
+
+    uint64_t elapsed =
+        StkTime::getMonoTimeMs() - m_idle_gp_start_time;
+
+    if (elapsed >= timeout)
+        return 0;
+
+    return static_cast<int>(
+        (timeout - elapsed + 59999ULL) / 60000ULL
+    );
+}
