@@ -451,13 +451,17 @@ bool TeamManager::teamsAreMessedUp() const
     {
         auto peer = player->getPeer();
 
+        if (!peer)
+            continue;
+
+        // Hourglass players cannot participate in the next race.
+        if (!getCrownManager()->canRace(peer))
+            continue;
+
         // Spectators don't participate in the next race.
         // ASM_NO_TEAM must still be checked by preventteammess.
-        if (peer &&
-            (peer->isSpectator() || peer->alwaysSpectateButNotNeutral()))
-        {
+        if (peer->isSpectator() || peer->alwaysSpectateButNotNeutral())
             continue;
-        }
 
         has_player = true;
 
