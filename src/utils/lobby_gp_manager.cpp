@@ -314,6 +314,18 @@ void LobbyGPManager::armIdleQuitTimer()
         "Idle quit timer armed for %d minute(s).",
         minutes
     );
+
+    Comm::sendStringToAllPeers(
+        "Server will shut down in " +
+        std::to_string(minutes) +
+        (minutes == 1 ? " minute" : " minutes") +
+        " if no racing activity"
+    );
+
+    if (minutes == 15 || (minutes >= 1 && minutes <= 5))
+    {
+        m_idle_quit_last_warning = minutes;
+    }
 }
 
 void LobbyGPManager::disarmIdleQuitTimer()
@@ -321,6 +333,23 @@ void LobbyGPManager::disarmIdleQuitTimer()
     m_idle_quit_armed = false;
     m_idle_quit_start_time = 0;
     m_idle_quit_last_warning = 0;
+}
+
+bool LobbyGPManager::updateIdleQuitTimerSetting()
+{
+    if (getSettings()->getIdleQuitMinutes() <= 0)
+    {
+        disarmIdleQuitTimer();
+        return false;
+    }
+
+    if (m_idle_quit_armed)
+    {
+        armIdleQuitTimer();
+        return true;
+    }
+
+    return false;
 }
 
 void LobbyGPManager::checkIdleQuitTimer()
@@ -399,6 +428,17 @@ void LobbyGPManager::armIdleGPTimer()
         "Idle GP timer armed for %d minute(s).",
         minutes
     );
+
+    Comm::sendStringToAllPeers(
+        "GP will be reset in " +
+        std::to_string(minutes) +
+        (minutes == 1 ? " minute" : " minutes") +
+        " if the next race is not started"
+    );
+    if (minutes == 10 || (minutes >= 1 && minutes <= 5))
+    {
+        m_idle_gp_last_warning = minutes;
+    }
 }
 
 void LobbyGPManager::disarmIdleGPTimer()
@@ -406,6 +446,23 @@ void LobbyGPManager::disarmIdleGPTimer()
     m_idle_gp_armed = false;
     m_idle_gp_start_time = 0;
     m_idle_gp_last_warning = 0;
+}
+
+bool LobbyGPManager::updateIdleGPTimerSetting()
+{
+    if (getSettings()->getIdleGPMinutes() <= 0)
+    {
+        disarmIdleGPTimer();
+        return false;
+    }
+
+    if (m_idle_gp_armed)
+    {
+        armIdleGPTimer();
+        return true;
+    }
+
+    return false;
 }
 
 void LobbyGPManager::checkIdleGPTimer()

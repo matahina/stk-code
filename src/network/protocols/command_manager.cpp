@@ -3727,16 +3727,15 @@ void CommandManager::process_idlequit(Context& context)
     }
 
     getSettings()->setIdleQuitMinutes(minutes);
+    bool timer_rearmed = getGPManager()->updateIdleQuitTimerSetting();
 
     if (minutes == 0)
     {
-        getGPManager()->disarmIdleQuitTimer();
-
         Comm::sendStringToAllPeers(
             "Idle quit is now disabled"
         );
     }
-    else
+    else if (!timer_rearmed)
     {
         Comm::sendStringToAllPeers(
             "Idle quit is now set to " +
@@ -3794,16 +3793,14 @@ void CommandManager::process_idlegp(Context& context)
     }
 
     getSettings()->setIdleGPMinutes(minutes);
-
+    bool timer_rearmed = getGPManager()->updateIdleGPTimerSetting();
     if (minutes == 0)
     {
-        getGPManager()->disarmIdleGPTimer();
-
         Comm::sendStringToAllPeers(
             "Idle GP reset is now disabled"
         );
     }
-    else
+    else if (!timer_rearmed)
     {
         Comm::sendStringToAllPeers(
             "Idle GP reset is now set to " +

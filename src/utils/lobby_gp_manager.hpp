@@ -84,6 +84,9 @@ public:
     void armIdleGPTimer();
     void disarmIdleGPTimer();
 
+    bool updateIdleQuitTimerSetting();
+    bool updateIdleGPTimerSetting();
+
     void autoLockGP();
 
 private:

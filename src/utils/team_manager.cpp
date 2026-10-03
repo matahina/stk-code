@@ -452,8 +452,12 @@ bool TeamManager::teamsAreMessedUp() const
         auto peer = player->getPeer();
 
         // Spectators don't participate in the next race.
-        if (peer && peer->alwaysSpectate())
+        // ASM_NO_TEAM must still be checked by preventteammess.
+        if (peer &&
+            (peer->isSpectator() || peer->alwaysSpectateButNotNeutral()))
+        {
             continue;
+        }
 
         has_player = true;
 
