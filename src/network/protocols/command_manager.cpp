@@ -3727,7 +3727,7 @@ void CommandManager::process_idlequit(Context& context)
     }
 
     getSettings()->setIdleQuitMinutes(minutes);
-    bool timer_rearmed = getGPManager()->updateIdleQuitTimerSetting();
+    getGPManager()->updateIdleGPTimerSetting();
 
     if (minutes == 0)
     {
@@ -3735,7 +3735,7 @@ void CommandManager::process_idlequit(Context& context)
             "Idle quit is now disabled"
         );
     }
-    else if (!timer_rearmed)
+    else
     {
         Comm::sendStringToAllPeers(
             "Idle quit is now set to " +

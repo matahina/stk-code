@@ -428,17 +428,6 @@ void LobbyGPManager::armIdleGPTimer()
         "Idle GP timer armed for %d minute(s).",
         minutes
     );
-
-    Comm::sendStringToAllPeers(
-        "GP will be reset in " +
-        std::to_string(minutes) +
-        (minutes == 1 ? " minute" : " minutes") +
-        " if the next race is not started"
-    );
-    if (minutes == 10 || (minutes >= 1 && minutes <= 5))
-    {
-        m_idle_gp_last_warning = minutes;
-    }
 }
 
 void LobbyGPManager::disarmIdleGPTimer()
